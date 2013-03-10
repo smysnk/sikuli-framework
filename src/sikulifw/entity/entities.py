@@ -5,12 +5,12 @@ All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
 met:
-á Redistributions of source code must retain the above copyright notice,
+* Redistributions of source code must retain the above copyright notice,
 this list of conditions and the following disclaimer.
-á Redistributions in binary form must reproduce the above copyright
+* Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
-á Neither the name of the Copyright holder (SMART Technologies ULC) nor
+* Neither the name of the Copyright holder (SMART Technologies ULC) nor
 the names of its contributors (Joshua Henn) may be used to endorse or
 promote products derived from this software without specific prior
 written permission.
@@ -40,8 +40,7 @@ from sikuli.Region import Region
 import time
 import math
 import string
-
-
+import os
 
 class Application(Entity):
     """ Application Entitiy """
@@ -304,7 +303,10 @@ class TextBox(Entity):
     
     def __init__(self, parent, *args, **kargs):
         super(TextBox, self).__init__(parent, *args, **kargs)
-
+        
+    def assertBaseline(self, text):        
+        pass
+    
     def type(self, text, callback=None, context=None, verify=True, **kargs):
         """ Select a element (eg. Button) """
          
@@ -319,8 +321,8 @@ class TextBox(Entity):
         self.config.screen.mouseUp(InputEvent.BUTTON1_MASK)
         sleep(0.5)
         keyMod = KeyModifier.CTRL
-        import os
-        if os._name == 'posix':
+        
+        if os.get == 'posix':
             keyMod = KeyModifier.CMD
         self.config.screen.type(None, "a", keyMod)
         sleep(0.5)
