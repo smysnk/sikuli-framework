@@ -37,6 +37,7 @@ class Calculator(Application):
     
     shared_state = {}
 
+    LCD_DISPLAY = ["lcdDisplay", TextBox]
     BUTTON_0 = ["button0", Button]
     BUTTON_1 = ["button1", Button]
     BUTTON_2 = ["button2", Button]

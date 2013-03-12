@@ -37,16 +37,16 @@ Most traditional "Sikuli scripts" are created by capturing baseline images aroun
 
 ### Example 1 - Validating Calculator is present on the screen
 
-#### (Python) - #python run.py quickstart/calculator/validate.py
+#### Python - #python run.py quickstart/calculator/validate.py
 
     calculator = Calculator()
 	calculator.validate()
 
 ### Example 2 - Adding 2 + 2 (OSX/Win)
 
-#### (Python) - #python run.py quickstart/calculator/add.py
+#### Python - #python run.py quickstart/calculator/add.py
 
-    calculator = Launcher.run("Calculator")
+    calculator = Calculator()
     calculator[Calculator.BUTTON_2].click() \
         [Calculator.BUTTON_PLUS].click() \
         [Calculator.BUTTON_2].click() \

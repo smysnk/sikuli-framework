@@ -230,41 +230,38 @@ class Finder(FinderAbstract):
         """ Return the image names for a certain sequence 
         @keyword type: Collection type
         @keyword series: If COL_SERIES or COL_SERIES_SEQUENCE, series # 
-        
         """
-        
+
         # Populate path & collectionType
         self.findBaselines()
                        
         files = []
         sequence = 0 
-        while True:            
-            try:        
-                # form suffix based on type, series/sequence #        
-                if self.collectionType == self.COL_TYPE_SINGLE:
-                    suffix = ''
-                elif self.collectionType == self.COL_TYPE_SERIES:
-                    suffix = '[' + str(series) + ']'
-                elif self.collectionType == self.COL_TYPE_SEQUENCE:
-                    suffix = '-' + str(sequence)
-                elif self.collectionType == self.COL_TYPE_SERIES_SEQUENCE:
-                    suffix = '[' + str(series) + ']-' + str(sequence)
-                
-                # Create the path to the images
-                match = re.search(r"([^/\\[]*.?)(?:|-[0-9]{1,2}|\[[0-9]{1,2}\]|\[[0-9]{1,2}\]-[0-9]{1,2}).png", self.path, re.IGNORECASE)
-                
-                filename = os.path.dirname(self.path) + "/" + match.group(1) + suffix + ".png"            
-                files.append( filename )
-                
-            except FileNotFoundException, e:
-                break # end of sequence
+        while True:
+            # form suffix based on type, series/sequence #        
+            if self.collectionType == self.COL_TYPE_SINGLE:
+                suffix = ''
+            elif self.collectionType == self.COL_TYPE_SERIES:
+                suffix = '[' + str(series) + ']'
+            elif self.collectionType == self.COL_TYPE_SEQUENCE:
+                suffix = '-' + str(sequence)
+            elif self.collectionType == self.COL_TYPE_SERIES_SEQUENCE:
+                suffix = '[' + str(series) + ']-' + str(sequence)
             
+            # Create the path to the images
+            match = re.search(r"([^/\\[\]]*?)(?:-[0-9]{1,2}|\[[0-9]{1,2}\]|\[[0-9]{1,2}\]-[0-9]{1,2}|).png", self.path, re.IGNORECASE)
+            filename = os.path.dirname(self.path) + "/" + match.group(1) + suffix + ".png"
+            
+            if not os.path.isfile(filename):
+                break
+            
+            files.append( filename )
+            
+            # If single image, or series only 1 file to return
+            if (self.collectionType == self.COL_TYPE_SINGLE) or (self.collectionType == self.COL_TYPE_SERIES): 
+                return files
             else:
-                # If single image, or series only 1 file to return
-                if (self.collectionType == self.COL_TYPE_SINGLE) or (self.collectionType == self.COL_TYPE_SERIES): 
-                    return files
-                else:
-                    sequence += 1
+                sequence += 1
         
         assert len(files) > 0 # we should have returned at least one file        
         return files

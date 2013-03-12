@@ -39,7 +39,11 @@ Config.setScreenshotLoggingLevel(TRACE)
 # Create a new instance of the calculator
 calculator = Calculator()
 
-calculator[Calculator.BUTTON_2].click() \
+
+calculator[Calculator.LCD_DISPLAY].validate()
+
+calculator[Calculator.BUTTON_CLEAR].click() \
+    [Calculator.BUTTON_2].click() \
     [Calculator.BUTTON_PLUS].click() \
     [Calculator.BUTTON_2].click() \
     [Calculator.BUTTON_EQUALS].click()
