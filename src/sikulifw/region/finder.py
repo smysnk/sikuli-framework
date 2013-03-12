@@ -5,12 +5,12 @@ All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
 met:
-á Redistributions of source code must retain the above copyright notice,
+* Redistributions of source code must retain the above copyright notice,
 this list of conditions and the following disclaimer.
-á Redistributions in binary form must reproduce the above copyright
+* Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
-á Neither the name of the Copyright holder (SMART Technologies ULC) nor
+* Neither the name of the Copyright holder (SMART Technologies ULC) nor
 the names of its contributors (Joshua Henn) may be used to endorse or
 promote products derived from this software without specific prior
 written permission.
@@ -127,8 +127,8 @@ class Finder(FinderAbstract):
             self.state = "[%s]" % state        
         
         """
-        NAME_TYPE_FULL = 'FULL'                     # Notebook.FileMenu.SaveDialog,button    # Notebook.FileMenu.SaveDialog
-        NAME_TYPE_GENERIC = 'GENERIC'               # Notebook.SaveDialog,button             # Notebook.SaveDialog
+        NAME_TYPE_FULL = 'FULL'                     # App.FileMenu.SaveDialog,button         # App.FileMenu.SaveDialog
+        NAME_TYPE_GENERIC = 'GENERIC'               # App.SaveDialog,button                  # App.SaveDialog
         NAME_TYPE_CLASS_ENTITY = 'CLASS_ENTITY'     # Button,button                          # Window.SaveDialog
         NAME_TYPE_CLASS = 'CLASS'                   # Button                                 # Window
         """
@@ -233,6 +233,7 @@ class Finder(FinderAbstract):
         
         """
         
+        # Populate path & collectionType
         self.findBaselines()
                        
         files = []
@@ -250,7 +251,8 @@ class Finder(FinderAbstract):
                     suffix = '[' + str(series) + ']-' + str(sequence)
                 
                 # Create the path to the images
-                match = re.search(r"([^/\\[]*.?)(?:-[0-9]{1,2}|\[[0-9]{1,2}\]|\[[0-9]{1,2}\]-[0-9]{1,2}).png", self.path, re.IGNORECASE)
+                match = re.search(r"([^/\\[]*.?)(?:|-[0-9]{1,2}|\[[0-9]{1,2}\]|\[[0-9]{1,2}\]-[0-9]{1,2}).png", self.path, re.IGNORECASE)
+                
                 filename = os.path.dirname(self.path) + "/" + match.group(1) + suffix + ".png"            
                 files.append( filename )
                 

@@ -118,7 +118,7 @@ class Target(object):
 		
 		return self.getBinary() + \
 				['-cp', target.getClassPath()] + \
-				['-Dpython.path=.' + target.getDelimiter() + 'java/sikuli-script.jar/Lib' + target.getDelimiter() + 'src'] + \
+				['-Dpython.path=.' + target.getDelimiter() + 'java/sikuli-script.jar/Lib' + target.getDelimiter() + 'src' + target.getDelimiter() + 'resources'] + \
 				self.getMemoryLimit() + \
 				self.getMainClass() + \
 				self.getArgs()

@@ -51,7 +51,7 @@ class Config():
     highlightTime = 1  # When debugging is enabled.. highlight exists, wait, etc    
     waitTime = 0
     
-    imageBaseline = "baseline" # image baseline directory    
+    imageBaseline = "resources/baseline" # image baseline directory    
     
     loggingLevel = None # If 'development' file exists in root, we're in dev env
     screenshotLoggingLevel = None
@@ -102,7 +102,7 @@ class Config():
     @classmethod
     def setScreenshotLoggingLevel(cls, level):
         
-        cls.logger.getRobotLogger().log(level, "Changing screenshot logging level")
+        cls.logger.getLogger().log(level, "Changing screenshot logging level")
         cls.screenshotLoggingLevel = level
         
     @classmethod

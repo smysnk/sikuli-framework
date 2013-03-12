@@ -1,17 +1,53 @@
-SikuliFramework - Object-Oriented GUI Automation Framework 
+SikuliFramework - An Object-Oriented GUI Automation Framework for Sikuli
 ================
 
-SikuliFramework provides an object-oriented abstraction on top of [Sikuli](http://www.sikuli.org) to assist with interacting GUI elements, such as sets of buttons, checkboxes, radio buttons, windows and dialogue hierarchies for GUI automation and testing.  This abstraction also provides some of the following benefits:
+SikuliFramework provides an object-oriented abstraction on top of [Sikuli](http://www.sikuli.org) to assist with interacting GUI elements, such as sets of buttons, checkboxes, radio buttons, windows and dialogue hierarchies for GUI automation and testing.  
+
+This abstraction also provides some of the following benefits:
 
  - Cleaner, more readable code
- - Provides structure to naming of image assets
+ - Provides structure to naming of baselines
  - Dynamic resolution of image assets (Designate different images based on OS)
+ - Encourages baseline reuse (Rather than capturing images to solve your immediate task, capture to solve all tasks)
  - Higher accuracy matching GUI components due to use of Regions
  - Tight integration with [RobotFramework](http://code.google.com/p/robotframework/) - Inspired by [Mike's cognition's Blog](http://blog.mykhailo.com/2011/02/how-to-sikuli-and-robot-framework.html) 
+ - Encourages code reuse in RobotFramework test libraries
+ - Streamlines baseline creation for assertions (baselines are created automatically during the initial run of the script)
+ - Solves some of Sikuli's common downfalls (false-positives, context issues)
+ - Greatly improved reports for debugging and general-purpose
+ - Increases the robustness of test scripts (less dependant on speed of the machine, resolution, other problems)
 
-### Example 1 - Adding 2 + 2 on Calculator (OSX/Win)
+## Common problems with traditional "Sikuli scripts"
 
-#### (Python)
+Most traditional "Sikuli scripts" are created by capturing baseline images of a series of steps required to perform a specific test.  This allows for the quick creation of a test script to perform this one specific test.  There are however a few inherent problems with creating scripts in this method.
+
+Problems include:
+
+  - Maintainability issues
+     - Baseline images are usually very specific to a test and cannot be reused
+     - If the any of the baseline images change, multiple baseline images need be fixed for 1 change in the UI 
+     - No enforced naming convention for baseline pictures (Everyone has a different way of naming things)
+  - [Fragile tests](http://xunitpatterns.com/Fragile%20Test.html)
+     - "Sikuli script" often devolve into "hacky" code to get the job done, but it is hard to create truly maintainable tests
+        - Use of wait(seconds) function depends on computer being fairly fast or increased time is needed, lots of time is wasted waiting around, decreases the readability of tests if there are wait commands everywhere
+        - Operations are performed without validating whether the system is actually in sync
+            - Clicking a checkbox, is the checkbox actually selected after the operation?
+            - Entering text, is the text entered as you expect it?
+            - Did clicking a button actually perform the action you expected it to? A regular Sikuli script will only fail after it cannot find an image it is expecting to present on the screen
+
+
+## Code Examples
+
+### Example 1 - Validating Calculator is present on the screen
+
+#### (Python) - sandbox/calculator/validate.py
+
+    calculator = Calculator()
+	calculator.validate()
+
+### Example 2 - Adding 2 + 2 (OSX/Win)
+
+#### (Python) - sandbox/calculator/add.py
 
     calculator = Launcher.run("Calculator")
     calculator[Calculator.TWO].click()
@@ -36,7 +72,7 @@ SikuliFramework provides an object-oriented abstraction on top of [Sikuli](http:
         ${Screen}=               Calculator.Select   Screen
 		Calculator.AssertEquals	 ${Screen}           4
 
-### Example 2 - Convert 25 celsius to fahrenheit (OSX)
+### Example 3 - Convert 25 celsius to fahrenheit (OSX)
 
     calculator = Launcher.run("Calculator")
     
