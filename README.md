@@ -1,4 +1,4 @@
-SikuliFramework - An Object-Oriented GUI Automation Framework for Sikuli
+SikuliFramework - GUI Automation Framework for Sikuli
 ================
 
 SikuliFramework provides an object-oriented abstraction on top of [Sikuli](http://www.sikuli.org) to assist with interacting GUI elements, such as sets of buttons, checkboxes, radio buttons, windows and dialogue hierarchies for GUI automation and testing.  
