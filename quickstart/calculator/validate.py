@@ -40,7 +40,7 @@ is already running.  Results can be found in the /results directory.
 """
 
 # Change logging level verbosity
-EntityLoggerProxy.getRobotLogger().setLevel(TRACE)
+EntityLoggerProxy.getLogger().setLevel(TRACE)
 Config.setScreenshotLoggingLevel(TRACE)
 
 # Create a new instance of the calculator
