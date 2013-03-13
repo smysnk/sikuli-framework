@@ -27,5 +27,50 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
+import bootstrap
+from config import Config
+from log import EntityLoggerProxy
+from log.level import TRACE
+from maps.textedit import TextEdit, MenuBar, FileMenu, TextEditMenu
+from region.transform import RegionMorph
 
-from wrapper import *
+"""
+Simple example that validates that the calculator is present on the screen.
+This example does not use the Launcher() class so it assumes that the application
+is already running.  Results can be found in the /results directory. 
+"""
+
+# Change logging level verbosity
+#EntityLoggerProxy.getLogger().setLevel(TRACE)
+Config.setScreenshotLoggingLevel(TRACE)
+
+
+# Create a new instance of the TextEdit application
+textedit = TextEdit()
+logger = EntityLoggerProxy(textedit)
+
+# Type some text in the text area
+textedit[TextEdit.TEXT_AREA].type("This is a demo of SikuliFramework")
+
+# Resize the application size 4 times
+for i in range(0,4):
+    
+    # Get the current application region
+    region = textedit.validate().region
+    
+    # Alternate between growing / shrinking application width
+    offset = 100 * (1 - ((i % 2)*2))
+    
+    # Modify the size of current application region
+    morph = RegionMorph(0, 0, offset, 0)
+    region = morph.apply(region) 
+    region = region.right(0).below(0) # Get the bottom right corner
+    
+    logger.info("resizing bottom right corner to %s" % region)
+    
+    # Drag the bottom right hand corner 100px to right
+    textedit[TextEdit.BOTTOM_RIGHT_CORNER].drag(region)
+
+# Close down the application
+textedit[TextEdit.MENU_BAR][MenuBar.TEXTEDIT].click() \
+    [TextEditMenu.QUIT].click()

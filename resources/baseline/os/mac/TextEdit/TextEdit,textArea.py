@@ -28,17 +28,19 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from region.transform import Transform, RegionBelow, RegionMorph
+from region.transform import Transform, RegionMorph, RegionLimitByParent,\
+    PatternSimilarity
 
 transforms = {
-    Transform.CONTEXT_PREVIOUS: [
-        RegionMorph(1, 1, 2, 2)
-                                 ], \
-    Transform.CONTEXT_CURRENT: [], \
-    Transform.CONTEXT_NEXT: [ \
-        RegionBelow(100),
-                              ], \
+    Transform.CONTEXT_PREVIOUS: [], \
+    Transform.CONTEXT_CURRENT: [
+        PatternSimilarity(0.84),
+                                ], \
+    Transform.CONTEXT_NEXT: [], \
     Transform.CONTEXT_MATCH: [], \
-    Transform.CONTEXT_FINAL: [], \
+    Transform.CONTEXT_FINAL: [
+        RegionMorph(0,15,2000,2000),
+        RegionLimitByParent()
+                              ], \
     Transform.CONTEXT_ENTITY: []
   }

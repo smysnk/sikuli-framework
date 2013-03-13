@@ -28,17 +28,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from region.transform import Transform, RegionBelow, RegionMorph
-
-transforms = {
-    Transform.CONTEXT_PREVIOUS: [
-        RegionMorph(1, 1, 2, 2)
-                                 ], \
-    Transform.CONTEXT_CURRENT: [], \
-    Transform.CONTEXT_NEXT: [ \
-        RegionBelow(100),
-                              ], \
-    Transform.CONTEXT_MATCH: [], \
-    Transform.CONTEXT_FINAL: [], \
-    Transform.CONTEXT_ENTITY: []
-  }
+from entity import Entity
+from entities import *
+from multiResultProxy import *
+from searcher import *

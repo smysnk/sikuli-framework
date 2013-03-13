@@ -28,7 +28,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from sikulifw.entity import Window, Button, TextBox, DropDown, Application,\
+from entity import Window, Button, TextBox, DropDown, Application,\
     CheckBox, Radio, ProgressBar
 from org.sikuli.script import OS
 

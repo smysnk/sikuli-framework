@@ -3,6 +3,11 @@ SikuliFramework - GUI Automation Framework for Sikuli
 
 SikuliFramework provides an object-oriented abstraction on top of [Sikuli](http://www.sikuli.org) to assist with interacting GUI elements, such as sets of buttons, checkboxes, radio buttons, windows and dialogue hierarchies for GUI automation and testing.  
 
+**What is Sikuli?**
+
+Sikuli is a visual technology to automate and test graphical user interfaces (GUI) using images (screenshots) of the software under test.
+- [Wikipedia](http://en.wikipedia.org/wiki/Sikuli)
+
 ## Common problems with traditional "Sikuli scripts"
 
 Most traditional "Sikuli scripts" are created by capturing baseline images around a series of steps required to solve a particular problem.  This allows for the quick creation of a script to solve a problem.  There are however a few inherent problems with creating scripts in this method, these include:
@@ -35,27 +40,21 @@ Most traditional "Sikuli scripts" are created by capturing baseline images aroun
 
 ## Code Examples
 
-### Example 1 - Validating Calculator is present on the screen
-
-#### Python - #python run.py quickstart/calculator/validate.py
+#### Work with applications in a more natural object-oriented way
 
     calculator = Calculator()
-	calculator.validate()
 
-### Example 2 - Adding 2 + 2 (OSX/Win)
-
-#### Python - #python run.py quickstart/calculator/add.py
-
-    calculator = Calculator()
-    calculator[Calculator.BUTTON_2].click() \
-        [Calculator.BUTTON_PLUS].click() \
-        [Calculator.BUTTON_2].click() \
+    # Chain together operations on the same window 
+    calculator[Calculator.BUTTON_2].click()
+        [Calculator.BUTTON_PLUS].click()
+        [Calculator.BUTTON_2].click() 
         [Calculator.BUTTON_EQUALS].click()
-  
+        
+    # Built-in assertions methods for testing purposes
     calculator[Calculator.SCREEN].assertEquals("4")
 
-#### (RobotFramework TSV) - #python run.py quickstart/calculator/add.tsv
-    
+#### Integrates with RobotFramework to create extremely readable tests
+
     *Setting*
     Library	keywords/CalculatorLib.py	WITH NAME	Calculator
 
@@ -69,33 +68,29 @@ Most traditional "Sikuli scripts" are created by capturing baseline images aroun
         ${Screen}=               Calculator.Select   Screen
 		Calculator.AssertEquals	 ${Screen}           4
 
-### Example 3 - Convert 25 celsius to fahrenheit (OSX) - #python run.py quickstart/calculator/convert.py
+### Map out special GUI elements such as a TextBox, Radio, Checkbox + more and interact with them as such
 
-    calculator = Launcher.run("Calculator")
-    
     calculator[Calculator.SCREEN].type("25")
     
-    # Select convert temperature from conversion menu
-    convertDialog = calculator[Calculator.MENUBAR][MenuBar.CONVERT].click()
-            [ConvertMenu.TEMPERATURE].click()
     
-    # Change convert from celsius to fahrenheit
-    convertDialog[ConvertDialog.FROM].click()
-            [ConvertFromDropDown.CELSIUS].click()
-            
-    convertDialog[ConvertDialog.TO].click()
-    		[ConvertToDropDown.FAHRENHEIT].click()
-    		
-    # Convert
-    convertDialog[ConvertDialog.CONVERT].click()
+### Map out the resulting actions of clicking a button
     
-    calculator[Calculator.SCREEN].assertEquals("77")
+    # Create initial application context
+    textedit = TextEdit()
     
+    # Result of clicking the TextEdit button is a TextEditMenu
+    textEditMenu = textedit[TextEdit.MENU_BAR][MenuBar.TEXTEDIT].click()
     
+    # Perform actions on the new context created from the result of the previous action
+    textEditMenu[TextEditMenu.QUIT].click()
 
+## Getting Started
 
-    
-    
+[Documentation + Tutorials](https://github.com/smysnk/sikuli-framework/wiki)
+ 
+--------------------------------------
+
+Created by Joshua Henn
     
     
     

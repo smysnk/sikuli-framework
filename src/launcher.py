@@ -28,17 +28,50 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from region.transform import Transform, RegionBelow, RegionMorph
+from entity import Application
+from org.sikuli.script import App, Env
+from config import Config
+from sikuli.Sikuli import sleep
+import os as osLib
+import java
+import subprocess
+from wrapper import *
 
-transforms = {
-    Transform.CONTEXT_PREVIOUS: [
-        RegionMorph(1, 1, 2, 2)
-                                 ], \
-    Transform.CONTEXT_CURRENT: [], \
-    Transform.CONTEXT_NEXT: [ \
-        RegionBelow(100),
-                              ], \
-    Transform.CONTEXT_MATCH: [], \
-    Transform.CONTEXT_FINAL: [], \
-    Transform.CONTEXT_ENTITY: []
-  }
+class Launcher(object):
+    
+    logger = None
+    
+    @classmethod
+    def setLogger(cls, logger):
+        cls.logger = logger(cls)    
+    
+    @classmethod
+    def run(cls, className):
+        """ Launch an application through reflection """
+
+        cls.logger.info("is attempting to run [%s] wd=%s" % (className, osLib.getcwd()))
+        
+        for appCls in Application.__subclasses__():
+            if className == appCls.__name__:
+                
+                os = Env.getOS()
+                osVersion = Env.getOSVersion(fullName=True)
+                arch = java.lang.System.getProperty('os.arch')
+                            
+                app = appCls() # get an instance of this class
+                binary = app.getBinary(os, osVersion, arch) # get the binary to run from the instance
+                cls.logger.info('created [%s] from [%s] [%s %s %s]' % (className, binary, os, osVersion, arch))
+                
+                result = subprocess.Popen([binary], cwd=app.getWorkingDir(os, osVersion, arch))
+                                
+                return app
+                
+        raise ValueError
+   
+
+    @classmethod
+    def formatPrefix(cls, *args, **args):
+        return "[Launcher] "
+    
+    
+    

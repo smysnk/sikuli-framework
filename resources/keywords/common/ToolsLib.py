@@ -28,17 +28,17 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 from core.lib.robotremoteserver import RobotRemoteServer
-import sikulifw.bootstrap # Startup sikulifw
+import bootstrap # Startup sikulifw
 import time
 import os
 import string
 import subprocess
 import sys
-from sikulifw.log import Logger
+from log import Logger
 import re
 
-#from sikulifw.log.decorators import Formatter
-from sikulifw.config import Config
+#from log.decorators import Formatter
+from config import Config
 
 
 class ToolsLib(object):

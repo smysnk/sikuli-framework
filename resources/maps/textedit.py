@@ -28,17 +28,32 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from region.transform import Transform, RegionBelow, RegionMorph
+from entity import Window, Button, TextBox, DropDown, Application,\
+    CheckBox, Radio, ProgressBar
+from org.sikuli.script import OS
 
-transforms = {
-    Transform.CONTEXT_PREVIOUS: [
-        RegionMorph(1, 1, 2, 2)
-                                 ], \
-    Transform.CONTEXT_CURRENT: [], \
-    Transform.CONTEXT_NEXT: [ \
-        RegionBelow(100),
-                              ], \
-    Transform.CONTEXT_MATCH: [], \
-    Transform.CONTEXT_FINAL: [], \
-    Transform.CONTEXT_ENTITY: []
-  }
+class FileMenu(Window):
+    pass
+
+class TextEditMenu(Window):
+    QUIT = ['quit', Button]
+
+class MenuBar(Window):
+    statusCascade = True
+    
+    FILE = ['file', Button, {'result':FileMenu}]
+    TEXTEDIT = ['textEdit', Button, {'result':TextEditMenu}]
+        
+class TextEdit(Application):
+    
+    shared_state = {}
+
+    MENU_BAR = [MenuBar]
+    BOTTOM_RIGHT_CORNER = ["bottomRightCorner", Button]
+    TEXT_AREA = ['textArea', TextBox]
+
+    def __init__(self):
+        super(TextEdit, self).__init__()
+
+        self.binary[OS.MAC] = 'TextEdit.app'
+    

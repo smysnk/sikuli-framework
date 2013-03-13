@@ -28,14 +28,14 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 from core.lib.robotremoteserver import RobotRemoteServer
-import sikulifw.bootstrap # Startup sikulifw
-from sikulifw.entity import *
+import bootstrap # Startup sikulifw
+from entity import *
 
 import os
 import sys
 import subprocess
 import platform
-from sikulifw.log import Logger
+from log import Logger
 from maps.common.vmware import VMWare
 from keywords.sikulifwLib import sikulifwLib
 

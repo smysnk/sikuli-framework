@@ -28,11 +28,11 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from sikulifw.config import Config
-from sikulifw.log import Logger, DEBUG, INFO, TRACE
+from config import Config
+from log import Logger, DEBUG, INFO, TRACE
 from sikuli.Sikuli import sleep
-from sikulifw.entity import Entity
-from sikulifw.entity.entities import ClickableEntity
+from entity import Entity
+from entity.entities import ClickableEntity
 
 
 class KeyNotInArgStorageException(Exception):

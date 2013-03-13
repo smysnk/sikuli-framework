@@ -27,5 +27,27 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
+import bootstrap
+from config import Config
+from log import *
+from maps.calculator import Calculator
+from wrapper import Env
+import os
+import sys
+import platform
 
-from wrapper import *
+# Change logging level verbosity
+EntityLoggerProxy.getLogger().setLevel(TRACE)
+Config.setScreenshotLoggingLevel(TRACE)
+
+# Create a new instance of the calculator
+calculator = Calculator()
+calculator[Calculator.BUTTON_CLEAR].click() \
+    [Calculator.BUTTON_2].click() \
+    [Calculator.BUTTON_PLUS].click() \
+    [Calculator.BUTTON_2].click() \
+    [Calculator.BUTTON_EQUALS].click()
+
+calculator[Calculator.LCD_DISPLAY].assertEquals("4")
+
+

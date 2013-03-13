@@ -28,17 +28,19 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from region.transform import Transform, RegionBelow, RegionMorph
+from region.transform import Transform, RegionRight, RegionScreen, RegionBelow,\
+    RegionMorph
 
 transforms = {
     Transform.CONTEXT_PREVIOUS: [
-        RegionMorph(1, 1, 2, 2)
+        RegionScreen(), # Since the menu bar on OSX is not part of the application it self, don't use the application region context
+        RegionBelow(25) # Menu bar is at the top of the screen, less than 25 pixels high
                                  ], \
     Transform.CONTEXT_CURRENT: [], \
-    Transform.CONTEXT_NEXT: [ \
-        RegionBelow(100),
+    Transform.CONTEXT_NEXT: [], \
+    Transform.CONTEXT_MATCH: [
+        RegionMorph(-500,0,1000,0) # Expand to fit full width
                               ], \
-    Transform.CONTEXT_MATCH: [], \
     Transform.CONTEXT_FINAL: [], \
     Transform.CONTEXT_ENTITY: []
   }

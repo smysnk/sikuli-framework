@@ -28,17 +28,36 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from region.transform import Transform, RegionBelow, RegionMorph
+class SikuliFrameworkException(Exception):
+    
+    logger = None
+    screenshot = None
+    entity = None
+    config = None
+    
+    @classmethod
+    def setLogger(cls, logger):
+        cls.logger = logger
+        
+    @classmethod
+    def setConfig(cls, config):
+        cls.config = config
+    
+    def __init__(self, value="", screenshot=False, entity=None, **kargs):
+        
+        self.value = value
+        self.screenshot = screenshot
+        self.entity = entity
+        self.logger = self.__class__.logger(entity)
 
-transforms = {
-    Transform.CONTEXT_PREVIOUS: [
-        RegionMorph(1, 1, 2, 2)
-                                 ], \
-    Transform.CONTEXT_CURRENT: [], \
-    Transform.CONTEXT_NEXT: [ \
-        RegionBelow(100),
-                              ], \
-    Transform.CONTEXT_MATCH: [], \
-    Transform.CONTEXT_FINAL: [], \
-    Transform.CONTEXT_ENTITY: []
-  }
+    def __str__(self):
+        
+        return "%s %s" % (self.logger.getFormatter()(self.config.screen), self.value)
+
+class CreateWindowFailed(SikuliFrameworkException):
+    def __init__(self, value, **kargs):
+        super(CreateWindowFailed, self).__init__(value, **kargs)
+    
+class ButtonDisabled(SikuliFrameworkException):
+    def __init__(self, value, **kargs):
+        super(ButtonDisabled, self).__init__(value, **kargs)

@@ -28,17 +28,31 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from region.transform import Transform, RegionBelow, RegionMorph
+import logging
+import string
+from log.robotframework import Handler, Formatter
 
-transforms = {
-    Transform.CONTEXT_PREVIOUS: [
-        RegionMorph(1, 1, 2, 2)
-                                 ], \
-    Transform.CONTEXT_CURRENT: [], \
-    Transform.CONTEXT_NEXT: [ \
-        RegionBelow(100),
-                              ], \
-    Transform.CONTEXT_MATCH: [], \
-    Transform.CONTEXT_FINAL: [], \
-    Transform.CONTEXT_ENTITY: []
-  }
+class Logger(logging.Logger):
+    """
+    Main logger class
+    """
+    
+    formatter = None
+    
+    def __init__(self):
+        logging.Logger.__init__(self, "Logger")
+        
+        # RobotFramework log handler
+        fh = Handler()
+        fh.setFormatter(Formatter()) 
+        self.addHandler(fh)
+        
+        # Textfile log handler
+        fh = logging.FileHandler('results/log.txt', mode='w')
+        fh.setFormatter(Formatter())        
+        self.addHandler(fh)        
+        
+    def log(self, level, msg, *args, **kwargs):
+        logging.Logger.log(self, level, msg)
+        
+    

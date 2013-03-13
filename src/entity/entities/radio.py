@@ -27,5 +27,10 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
+from entity.entities import ClickableEntity
 
-from wrapper import *
+class Radio(ClickableEntity):
+    """ Radio Entity """
+
+    def __init__(self, parent, *args, **kargs):
+        super(Radio, self).__init__(parent, *args, **kargs) 

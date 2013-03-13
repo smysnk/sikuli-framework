@@ -28,4 +28,27 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from wrapper import *
+from entity.entities import Button, Window
+from entity import Entity
+
+def invalidateDragBar(self, context):
+    context[context.DRAG_BAR].invalidate()
+
+class ScrollBar(Entity):
+            
+    
+    family = True
+    UP = ['up', lambda parent, **kargs: Button(parent, context=parent, callback=invalidateDragBar, **kargs)]
+    DOWN = ['down', lambda parent, **kargs: Button(parent, context=parent, callback=invalidateDragBar, **kargs)]
+    
+    DRAG_BAR = ['dragBar', lambda parent, **kargs: Window(parent, **kargs)]
+    
+    
+    def gotoTop(self):        
+        self[self.DRAG_BAR].move(self[self.UP].getRegion())
+        return self
+        
+    def gotoBottom(self):
+        self[self.DRAG_BAR].move(self[self.DOWN].getRegion())
+        return self
+        

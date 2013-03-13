@@ -28,14 +28,14 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 from core.lib.robotremoteserver import RobotRemoteServer
-import sikulifw.bootstrap
-from sikulifw.entities import *
+import bootstrap
+from entities import *
 
 import os
 import sys
 import subprocess
 import platform
-from sikulifw.log import Logger
+from log import Logger
 
 
 class Selenium:
