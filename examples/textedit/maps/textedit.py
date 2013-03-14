@@ -28,30 +28,32 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import bootstrap
-from launcher import Launcher
-import os, sys
+from entity import Window, Button, TextBox, DropDown, Application,\
+    CheckBox, Radio, ProgressBar
 from org.sikuli.script import OS
-from robotframework import RobotRemoteServer, SikuliFwRfAbstractLib
-from calculator.maps import Calculator
 
-class CalculatorLib(SikuliFwRfAbstractLib):
+class FileMenu(Window):
+    pass
 
-    def find(self):
-        if not self.entity:
-            self.create()
+class TextEditMenu(Window):
+    QUIT = ['quit', Button]
+
+class MenuBar(Window):
+    statusCascade = True
+    
+    FILE = ['file', Button, {'result':FileMenu}]
+    TEXTEDIT = ['textEdit', Button, {'result':TextEditMenu}]
         
-        self.entity.validate()
+class TextEdit(Application):
     
-    def create(self):
-        self.entity = Calculator()
-    
-    def launch(self):
-        self.entity = Launcher.run('Calculator')
+    shared_state = {}
 
-    
-if __name__ == "__main__":
-    
-    RobotRemoteServer(CalculatorLib(), *sys.argv[1:])
+    MENU_BAR = [MenuBar]
+    BOTTOM_RIGHT_CORNER = ["bottomRightCorner", Button]
+    TEXT_AREA = ['textArea', TextBox]
 
+    def __init__(self):
+        super(TextEdit, self).__init__()
+
+        self.binary[OS.MAC] = 'open /Applications/TextEdit.app'
     

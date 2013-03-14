@@ -5,7 +5,7 @@
 <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
 <path>/sikuli-framework/src</path>
 <path>/sikuli-framework/java/sikuli-script.jar</path>
-<path>/sikuli-framework/resources</path>
+<path>/sikuli-framework/examples</path>
 </pydev_pathproperty>
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_VERSION">python 2.7</pydev_property>
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_INTERPRETER">Default</pydev_property>

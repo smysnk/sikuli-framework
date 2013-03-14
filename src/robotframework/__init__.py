@@ -28,31 +28,5 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-"""
-Launches Calculator app, adds 2 + 2, verifies the result.
-Result log can be found in the /results directory. 
-"""
-
-import bootstrap
-from config import Config
-from log import EntityLoggerProxy
-from log.level import TRACE
-from maps.calculator import Calculator
-from launcher import Launcher
-
-# Change logging level verbosity
-EntityLoggerProxy.getLogger().setLevel(TRACE)
-Config.setScreenshotLoggingLevel(TRACE)
-
-# Launch the Calculator binary
-calculator = Launcher.run('Calculator')
-
-calculator[Calculator.BUTTON_CLEAR].click() \
-    [Calculator.BUTTON_2].click() \
-    [Calculator.BUTTON_PLUS].click() \
-    [Calculator.BUTTON_2].click() \
-    [Calculator.BUTTON_EQUALS].click()
-
-calculator[Calculator.LCD_DISPLAY].assertEquals("4")
-
-
+from robotRemoteServer import *
+from sikuliFwRfAbstractLib import *

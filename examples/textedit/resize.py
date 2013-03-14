@@ -33,6 +33,7 @@ from log import EntityLoggerProxy
 from log.level import TRACE
 from maps.textedit import TextEdit, MenuBar, FileMenu, TextEditMenu
 from region.transform import RegionMorph
+from launcher import Launcher
 
 """
 Simple example that validates that the calculator is present on the screen.
@@ -45,8 +46,8 @@ is already running.  Results can be found in the /results directory.
 Config.setScreenshotLoggingLevel(TRACE)
 
 
-# Create a new instance of the TextEdit application
-textedit = TextEdit()
+# Launch the Calculator binary
+textedit = Launcher.run('TextEdit')
 logger = EntityLoggerProxy(textedit)
 
 # Type some text in the text area

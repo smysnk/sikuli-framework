@@ -39,7 +39,7 @@ from log import EntityLoggerProxy
 class KeyNotInArgStorageException(Exception):
     pass
 
-class RfSikuliFwLib(object):
+class SikuliFwRfAbstractLib(object):
     """
     Base class for SikuliFramework Application entities, helps bridge SikuliFW with RobotFramework. 
     """

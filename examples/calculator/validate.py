@@ -36,8 +36,7 @@ from launcher import Launcher
 
 """
 Simple example that validates that the calculator is present on the screen.
-This example does not use the Launcher() class so it assumes that the application
-is already running.  Results can be found in the /results directory. 
+Results can be found in the /results directory. 
 """
     
 # Change logging level verbosity

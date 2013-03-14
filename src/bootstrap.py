@@ -49,6 +49,17 @@ from launcher import Launcher
 from log.formatter import Formatter
 from wrapper import *
 from sikuli.Screen import Screen
+import __main__
+
+# Detect where the script is being executed from
+try:
+    # Set the baseline directory to be relative to the main script file
+    Config.imageBaseline = "%s/baseline" % os.path.dirname(__main__.__file__)
+except AttributeError, e:
+    # We might be running from RobotFramework
+    from robot.libraries.BuiltIn import BuiltIn
+    Config.imageBaseline = "%s/baseline" % os.path.dirname(BuiltIn().replace_variables('${SUITE SOURCE}'))
+
 # Cleanup previous runs
 try:
     shutil.rmtree(Config.resultDir) # Delete results directory

@@ -27,3 +27,18 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
+
+from region.transform import Transform, RegionBelow, ActionClick
+
+transforms = {
+    Transform.CONTEXT_PREVIOUS: [
+        ActionClick(0,0) # Highlight the window
+                                 ], \
+    Transform.CONTEXT_CURRENT: [], \
+    Transform.CONTEXT_NEXT: [ \
+        RegionBelow() # The next search region should be blow the current match
+                              ], \
+    Transform.CONTEXT_MATCH: [], \
+    Transform.CONTEXT_FINAL: [], \
+    Transform.CONTEXT_ENTITY: []
+  }

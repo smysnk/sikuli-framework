@@ -28,30 +28,16 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import bootstrap
-from launcher import Launcher
-import os, sys
-from org.sikuli.script import OS
-from robotframework import RobotRemoteServer, SikuliFwRfAbstractLib
-from calculator.maps import Calculator
+from region.transform import Transform, RegionRight, RegionScreen, RegionBelow,\
+    RegionMorph
 
-class CalculatorLib(SikuliFwRfAbstractLib):
-
-    def find(self):
-        if not self.entity:
-            self.create()
-        
-        self.entity.validate()
-    
-    def create(self):
-        self.entity = Calculator()
-    
-    def launch(self):
-        self.entity = Launcher.run('Calculator')
-
-    
-if __name__ == "__main__":
-    
-    RobotRemoteServer(CalculatorLib(), *sys.argv[1:])
-
-    
+transforms = {
+    Transform.CONTEXT_PREVIOUS: [
+        RegionMorph(0, 0, 100, 200)
+                                 ], \
+    Transform.CONTEXT_CURRENT: [], \
+    Transform.CONTEXT_NEXT: [], \
+    Transform.CONTEXT_MATCH: [], \
+    Transform.CONTEXT_FINAL: [], \
+    Transform.CONTEXT_ENTITY: []
+  }
