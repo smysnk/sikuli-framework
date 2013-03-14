@@ -1,3 +1,4 @@
 /results
 *$py.class
 *.pyc
+.settings
