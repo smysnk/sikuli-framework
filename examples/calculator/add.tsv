@@ -1,0 +1,23 @@
+*Setting*	*Value*	*Value*	*Value*	*Value*	*Value*	*Value*	*Value*
+Library	examples/calculator/keywords/CalculatorLib.py	WITH NAME	Calculator
+
+*Test Case*	*Action*	*Argument*	*Argument*	*Argument*	*Argument*	*Argument*	*Argument*
+Add Two Numbers Pass
+	Calculator.Launch
+	Calculator.Click	Clear
+	Calculator.Click	Two
+	Calculator.Click	Plus
+	Calculator.Click	Two
+	Calculator.Click	Equals
+	${Display}=	Calculator.Select	Display
+	Calculator.AssertEquals	${Display}	4
+	
+Add Two Numbers Fail
+	Calculator.Launch
+	Calculator.Click	Clear
+	Calculator.Click	Two
+	Calculator.Click	Plus
+	Calculator.Click	Two
+	Calculator.Click	Equals
+	${Display}=	Calculator.Select	Display
+	Calculator.AssertEquals	${Display}	5

@@ -72,7 +72,6 @@ Most traditional "Sikuli scripts" are created by capturing baseline images aroun
 
     calculator[Calculator.SCREEN].type("25")
     
-    
 ### Map out the resulting actions of clicking a button
     
     # Create initial application context

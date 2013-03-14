@@ -62,11 +62,11 @@ class Launcher(object):
                 binary = app.getBinary(os, osVersion, arch) # get the binary to run from the instance
                 cls.logger.info('created [%s] from [%s] [%s %s %s]' % (className, binary, os, osVersion, arch))
                 
-                result = subprocess.Popen([binary], cwd=app.getWorkingDir(os, osVersion, arch))
+                result = subprocess.Popen(binary, shell=True, cwd=app.getWorkingDir(os, osVersion, arch))
                                 
                 return app
                 
-        raise ValueError
+        raise Exception("Unable to find Application sub-class [%s], ensure that it is included" % className)
    
 
     @classmethod

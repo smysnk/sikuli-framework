@@ -97,7 +97,5 @@ class Application(Entity):
             path = path.replace('<%Program Files%>', 'c:/Program Files')    
         elif os == OS.WINDOWS and arch == 'x86':
             path = path.replace('<%Program Files%>', 'c:/Program Files (x86)')
-        elif os == OS.MAC:
-            path = path.replace('<%Program Files%>', '/Applications')
         
         return path

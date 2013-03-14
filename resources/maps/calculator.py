@@ -38,16 +38,16 @@ class Calculator(Application):
     shared_state = {}
 
     LCD_DISPLAY = ["lcdDisplay", TextBox]
-    BUTTON_0 = ["button0", Button]
-    BUTTON_1 = ["button1", Button]
-    BUTTON_2 = ["button2", Button]
-    BUTTON_3 = ["button3", Button]
-    BUTTON_4 = ["button4", Button]
-    BUTTON_5 = ["button5", Button]
-    BUTTON_6 = ["button6", Button]
-    BUTTON_7 = ["button7", Button]
-    BUTTON_8 = ["button8", Button]
-    BUTTON_9 = ["button9", Button]
+    BUTTON_0 = ["buttonZero", Button]
+    BUTTON_1 = ["buttonOne", Button]
+    BUTTON_2 = ["buttonTwo", Button]
+    BUTTON_3 = ["buttonThree", Button]
+    BUTTON_4 = ["buttonFour", Button]
+    BUTTON_5 = ["buttonFive", Button]
+    BUTTON_6 = ["buttonSix", Button]
+    BUTTON_7 = ["buttonSeven", Button]
+    BUTTON_8 = ["buttonEight", Button]
+    BUTTON_9 = ["buttonNine", Button]
     BUTTON_DECIMAL = ["buttonDecimal", Button]
     BUTTON_EQUALS = ["buttonEquals", Button]
     BUTTON_PLUS = ["buttonPlus", Button]
@@ -65,5 +65,5 @@ class Calculator(Application):
         super(Calculator, self).__init__()
 
         self.binary[OS.WINDOWS] = 'calc.exe'
-        self.binary[OS.MAC] = 'Calculator.app'
+        self.binary[OS.MAC] = 'open /Applications/Calculator.app'
     

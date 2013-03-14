@@ -135,7 +135,7 @@ class RobotFramework(Target):
 	def getArgs(self):	
 		
 		return ['--pythonpath=.', \
-				'--outputdir=results', \
+				'--outputdir=robotresults', \
 				'--loglevel=' + self.getLogLevel(), \
 				'--name', '"Product"'] + self.arguments + [ args.target ]
 	
@@ -144,10 +144,8 @@ class RobotFramework(Target):
 		absoluteArgument = ['--absolute'] if self.absolutePostProcessingPath else [] 
 	
 		# Markup the log.html file
-		subprocess.call(['python', 'tools/sikulifw/patchLog.py', 'results/log.html'] + absoluteArgument)
+		#subprocess.call(['python', 'patchLog.py', 'results/log.html'] + absoluteArgument)
 		
-		# Create NUnit XML
-		subprocess.call(['python', 'tools/sikulifw/robotXMLConverter.py', 'n', 'results/output.xml', 'results/nunit.xml'])
 
 
 class Python(Target):
@@ -225,10 +223,8 @@ if args.screenshotLogLevel:
 		
 	
 # Setup anything that might be missing on path for Windows / Mac
-print os.name
 if os.name == 'posix':
 	os.environ['PATH'] = os.environ['PATH'] + r':/Applications/VMware Fusion.app/Contents/Library'  
-
 else:
 	os.environ['Path'] = os.environ['Path'] + r';.\libs;C:\Program Files (x86)\Java\jre6\bin;C:\Program Files\Java\jre6\bin;'
 	os.environ['PYTHONPATH'] = r'C:\Python27\DLLs;C:\Python27\lib;C:\Python27\lib\plat-win;C:\Python27\lib\lib-tk;C:\Python27;C:\Python27\lib\site-packages;C:\Program Files (x86)\Java\jre6\bin;.'
