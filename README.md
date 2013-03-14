@@ -65,8 +65,8 @@ Most traditional "Sikuli scripts" are created by capturing baseline images aroun
         Calculator.Click         Plus
         Calculator.Click         Two
         Calculator.Click         Equals
-        ${Screen}=               Calculator.Select   Screen
-		Calculator.AssertEquals	 ${Screen}           4
+        ${Screen}=               Calculator.Select   Display
+		Calculator.AssertEquals	 ${Display}           4
 
 ### Map out special GUI elements such as a TextBox, Radio, Checkbox + more and interact with them as such
 

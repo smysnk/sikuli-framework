@@ -35,13 +35,15 @@ from wrapper import Env
 import os
 import sys
 import platform
+from launcher import Launcher
 
 # Change logging level verbosity
 EntityLoggerProxy.getLogger().setLevel(TRACE)
 Config.setScreenshotLoggingLevel(TRACE)
 
-# Create a new instance of the calculator
-calculator = Calculator()
+# Launch the Calculator binary
+calculator = Launcher.run('Calculator')
+
 calculator[Calculator.BUTTON_CLEAR].click() \
     [Calculator.BUTTON_2].click() \
     [Calculator.BUTTON_PLUS].click() \

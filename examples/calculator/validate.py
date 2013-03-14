@@ -32,6 +32,7 @@ from config import Config
 from log import EntityLoggerProxy
 from log.level import TRACE
 from maps.calculator import Calculator
+from launcher import Launcher
 
 """
 Simple example that validates that the calculator is present on the screen.
@@ -43,8 +44,8 @@ is already running.  Results can be found in the /results directory.
 EntityLoggerProxy.getLogger().setLevel(TRACE)
 Config.setScreenshotLoggingLevel(TRACE)
 
-# Create a new instance of the calculator
-calculator = Calculator()
+# Launch the Calculator binary
+calculator = Launcher.run('Calculator')
 
 # Validate that the calculator exists on the screen
 calculator.validate()
