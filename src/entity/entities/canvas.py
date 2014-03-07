@@ -30,7 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 from entity import Entity
-from org.sikuli.script import OS, KeyModifier, Key, Location
+from org.sikuli.basics import OS
+from org.sikuli.script import KeyModifier, Key, Location
 import re
 from java.awt.event import InputEvent
 from region.exception import FindExhaustedException

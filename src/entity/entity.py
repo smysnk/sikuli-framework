@@ -33,7 +33,8 @@ import shutil
 import os
 from sikuli.Sikuli import getImagePath, capture
 import inspect
-from org.sikuli.script import ImageLocator, Pattern, FindFailed, Env
+from org.sikuli.basics import ImageLocator
+from org.sikuli.script import Pattern, FindFailed, Env
 from java.io import FileNotFoundException
 from md5 import md5
 from region.exception import ImageSearchExhausted,\

@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 from entity import Entity
 from wrapper import Env
 import re
-from org.sikuli.script import OS
+from org.sikuli.basics import OS
 
 class Application(Entity):
     """ Application Entitiy """

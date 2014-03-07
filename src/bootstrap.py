@@ -33,7 +33,7 @@ import os
 from sikuli import Env
 from sikuli.Sikuli import getImagePath, addImagePath, setShowActions, setAutoWaitTimeout, getNumberScreens
 import shutil
-from org.sikuli.script import OS
+from org.sikuli.basics import OS
 from config import Config
 from tool import Tool
 from log import *

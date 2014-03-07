@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 from sikuli.Sikuli import setShowActions, getNumberScreens
-from org.sikuli.script import Settings
+from org.sikuli.basics import Settings
 import os
 import java
 from java.lang import Thread

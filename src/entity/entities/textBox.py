@@ -36,7 +36,7 @@ from sikuli.Sikuli import sleep
 from wrapper import Env
 from sikuli.Region import Region
 import string
-from org.sikuli.script import OS
+from org.sikuli.basics import OS
 
 class TextBox(Entity):
     """ Textbox Entity """

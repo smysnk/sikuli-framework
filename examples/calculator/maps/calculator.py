@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from entity import Window, Button, TextBox, DropDown, Application,\
     CheckBox, Radio, ProgressBar
-from org.sikuli.script import OS
+from org.sikuli.basics import OS
 
         
 class Calculator(Application):

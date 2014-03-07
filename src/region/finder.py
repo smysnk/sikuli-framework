@@ -28,7 +28,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from org.sikuli.script import ImageLocator, FindFailed, Pattern
+from org.sikuli.script import FindFailed, Pattern
+from org.sikuli.basics import ImageLocator
 from java.io import FileNotFoundException
 import time
 from sikuli.Region import Region

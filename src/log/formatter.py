@@ -86,7 +86,7 @@ class Formatter(object):
             labelStr = '"%s"' % self.label
         
         elif isinstance(self.entity, Match):
-            match = re.search(r"(?P<match>Match.*?\])", str(self.entity), re.IGNORECASE)
+            match = re.search(r"(?P<match>M\[.*?\])", str(self.entity), re.IGNORECASE)
             if match:
                 labelStr = '"%s"' % match.group("match")
             else:
@@ -100,7 +100,7 @@ class Formatter(object):
                 raise Exception("Unable to regex match on Screen")            
         
         elif isinstance(self.entity, Region):
-            match = re.search(r"(?P<region>(Region).*?)@(?P<screen>Screen.*\])", str(self.entity), re.IGNORECASE)
+            match = re.search(r"(?P<region>R\[.*?)@(?P<screen>.*\])", str(self.entity), re.IGNORECASE)
             if match:
                 labelStr = '"%s"' % match.group("region")
             else:
@@ -137,12 +137,12 @@ class Formatter(object):
             
         elif isinstance(self.entity, Pattern):
             
-            match = re.search(r'Pattern\("(?P<path>.*?)"\)', str(self.entity), re.IGNORECASE)
+            match = re.search(r'P\((?P<path>.*?)\)', str(self.entity), re.IGNORECASE)
             if match:
                 imagePath = match.group("path")
                 images.append(self.tool.saveAsset(imagePath))
             else:
-                raise Exception("Unaable to match path")
+                raise Exception("Unaable to match path: %s" % str(self.entity))
 
                 # Capture images
         if self.meetsLogThreshold() and region:
