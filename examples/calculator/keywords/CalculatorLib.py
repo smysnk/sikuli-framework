@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import bootstrap
 from launcher import Launcher
 import os, sys
-from org.sikuli.script import OS
+from org.sikuli.basics import OS
 from robotframework import RobotRemoteServer, SikuliFwRfAbstractLib
 from calculator.maps import Calculator
 
