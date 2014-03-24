@@ -345,7 +345,13 @@ class Finder(FinderAbstract):
                 self.logger.trace("failed to find on screen %%s in %%s nameType=%s colType=%s ser=%s seq=%s" % (self.nameType, self.collectionType, series, sequence),  self.logger.getFormatter()(self).setLabel("Images"), self.logger.getFormatter()(nextRegion))
             else:
                 
-                region = Region(regions)
+                region = None
+                for currentRegion in regions:
+                    if not region:
+                        region = Region(currentRegion)
+                    else:
+                        region.add(currentRegion)
+
                 region = transform.apply(region, self.transform.CONTEXT_FINAL)
                 
                 # Apply entity transforms
