@@ -68,6 +68,8 @@ Most traditional "Sikuli scripts" are created by capturing baseline images aroun
         ${Screen}=               Calculator.Select   Display
 		Calculator.AssertEquals	 ${Display}           4
 
+![RobotFramework Results Log](https://github.com/smysnk/sikuli-framework/raw/master/docs/images/robo_example.png)
+
 ### Map out special GUI elements such as a TextBox, Radio, Checkbox + more and interact with them as such
 
     calculator[Calculator.SCREEN].type("25")
