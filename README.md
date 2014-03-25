@@ -70,6 +70,10 @@ Most traditional "Sikuli scripts" are created by capturing baseline images aroun
 
 ![RobotFramework Results Log](https://github.com/smysnk/sikuli-framework/raw/master/docs/images/robo_example.png)
 
+#### Augments RobotFramework's log.html message statements, adding inline hyperlinking to captured images
+
+![RobotFramework Results Log Hyperlinking](https://github.com/smysnk/sikuli-framework/raw/master/docs/images/robo_log_hyperlink.png)
+
 ### Map out special GUI elements such as a TextBox, Radio, Checkbox + more and interact with them as such
 
     calculator[Calculator.SCREEN].type("25")
