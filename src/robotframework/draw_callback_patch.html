@@ -1,0 +1,20 @@
+<script type="text/javascript">
+function drawCallback(element, childElement, childrenNames) {
+    return function () {
+        util.map(childrenNames, function (childName) {
+            var children = element[childName + 's']();
+            var template = childName + 'Template';
+            util.map(children, function (child) {
+
+                if (template === 'messageTemplate') {
+                    child.text = child.text.replace(/\[([^\(\)]+?)\]\(([a-z0-9]{32}\.png)(?:\:(.*?)|)\)/g, '<a href="../results/assets/$2" target="_blank">$1</a>');
+                }
+
+                $.tmpl(template, child).appendTo(childElement);
+
+            });
+        });
+    }
+}
+</script>
+</body>

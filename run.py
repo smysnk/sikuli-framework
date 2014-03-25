@@ -43,7 +43,27 @@ except ImportError:
 import getopt, sys, os, subprocess, platform
 from subprocess import CalledProcessError
 from sys import argv, stdout
+from tempfile import mkstemp
+from shutil import move
 
+
+def replace_in_file(file_path, old, new):
+    """ Helper function for patching RobotFramework's log.html """
+    # Create temp file
+    fh, abs_path = mkstemp()
+    new_file = open(abs_path, 'w')
+    old_file = open(file_path)
+    for line in old_file:
+        new_file.write(line.replace(old, new))
+
+    # Close temp file
+    new_file.close()
+    os.close(fh)
+    old_file.close()
+
+    # Remove original file, move new file
+    os.remove(file_path)   
+    move(abs_path, file_path)
 
 class Target(object):
 	""" Process target superclass """
@@ -145,7 +165,8 @@ class RobotFramework(Target):
 		absoluteArgument = ['--absolute'] if self.absolutePostProcessingPath else [] 
 	
 		# Markup the log.html file
-		#subprocess.call(['python', 'patchLog.py', 'results/log.html'] + absoluteArgument)
+		print "Patching log.html with asset hyperlinking functionality."
+		replace_in_file('robotresults/log.html', '</body>', open('src/robotframework/draw_callback_patch.html','r').read())
 		
 
 
