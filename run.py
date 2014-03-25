@@ -117,7 +117,7 @@ class Target(object):
 	def getLaunchArgs(self):
 		
 		return self.getBinary() + \
-				['-Dsikuli.Debug=3'] + \
+				['-Dsikuli.Debug=0'] + \
 				['-cp', target.getClassPath()] + \
 				['-Dpython.path=.' + target.getDelimiter() + 'java/sikuli-script.jar/Lib' + target.getDelimiter() + 'src' + target.getDelimiter() + 'examples'] + \
 				self.getMemoryLimit() + \
