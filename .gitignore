@@ -2,3 +2,4 @@
 *$py.class
 *.pyc
 .settings
+java/libs

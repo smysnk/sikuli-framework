@@ -69,7 +69,7 @@ class Target(object):
 	
 	def getClassPath(self):
 		
-		return 'java/' + target.__class__.__name__.lower() + '.jar' + self.delimiter + 'java/*' + self.delimiter + '.'
+		return 'java/' + target.__class__.__name__.lower() + '.jar' + self.delimiter + 'java/*' + self.delimiter + '.';
 	
 	def getMainClass(self):	
 		raise Exception("must be overridden")
@@ -117,6 +117,7 @@ class Target(object):
 	def getLaunchArgs(self):
 		
 		return self.getBinary() + \
+				['-Dsikuli.Debug=3'] + \
 				['-cp', target.getClassPath()] + \
 				['-Dpython.path=.' + target.getDelimiter() + 'java/sikuli-script.jar/Lib' + target.getDelimiter() + 'src' + target.getDelimiter() + 'examples'] + \
 				self.getMemoryLimit() + \
@@ -225,9 +226,6 @@ if args.screenshotLogLevel:
 # Setup anything that might be missing on path for Windows / Mac
 if os.name == 'posix':
 	os.environ['PATH'] = os.environ['PATH'] + r':/Applications/VMware Fusion.app/Contents/Library'  
-else:
-	os.environ['Path'] = os.environ['Path'] + r';.\libs;C:\Program Files (x86)\Java\jre6\bin;C:\Program Files\Java\jre6\bin;'
-	os.environ['PYTHONPATH'] = r'C:\Python27\DLLs;C:\Python27\lib;C:\Python27\lib\plat-win;C:\Python27\lib\lib-tk;C:\Python27;C:\Python27\lib\site-packages;C:\Program Files (x86)\Java\jre6\bin;.'
 
 # Get launch target 
 target = TargetFactory.getTarget(args.target)
