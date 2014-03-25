@@ -91,7 +91,7 @@ Most traditional "Sikuli scripts" are created by capturing baseline images aroun
  
 --------------------------------------
 
-Created by Joshua Henn
+Created by Joshua Bellamy-Henn
     
     
     
