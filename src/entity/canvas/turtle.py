@@ -39,7 +39,7 @@ class TurtleFoodComponent(object):
     
     def digest(self, turtle):
         
-        print "I am being digested by %s" % turtle
+        print("I am being digested by %s" % turtle)
         
         
 class TurtleFoodComposite(TurtleFoodComponent):
@@ -136,7 +136,7 @@ class Circle(TurtleFoodComponent):
         #TurtleFood.digest(self, stomach)
         
         resolution = self.resolution / 100.0
-        print resolution
+        print(resolution)
         step = 1 / resolution 
         
         turtle.on()

@@ -31,18 +31,55 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import time
 import shutil
 import os
-from sikuli.Sikuli import getImagePath, capture
 import inspect
-from org.sikuli.basics import ImageLocator
-from org.sikuli.script import Pattern, FindFailed, Env
-from java.io import FileNotFoundException
-from md5 import md5
 from region.exception import ImageSearchExhausted,\
     FindExhaustedException
-from exception import UpdateFailureException,\
+from entity.exception import UpdateFailureException,\
     TookTooLongToVanishException, TookTooLongToAppearException
 import re
-from java.awt.event import InputEvent
+from compat import text_type
+from config import BACKEND_SIKULIGO, Config
+
+if Config.backend == BACKEND_SIKULIGO:
+    from adapters.sikuligo_backend import Pattern
+
+    def getImagePath():
+        return []
+
+    def capture(region):
+        raise NotImplementedError("capture is not implemented for sikuligo backend")
+
+    class ImageLocator(object):
+        def locate(self, relpath):
+            roots = []
+            if hasattr(Config, "getImageSearchPaths"):
+                roots.extend(Config.getImageSearchPaths())
+            roots.append(os.getcwd())
+            for root in roots:
+                candidate = os.path.abspath(os.path.join(root, relpath))
+                if os.path.isfile(candidate):
+                    return candidate
+            raise FileNotFoundError(relpath)
+
+    class FindFailed(Exception):
+        pass
+
+    class Env(object):
+        @staticmethod
+        def getOS():
+            return "unknown"
+
+    FileNotFoundException = FileNotFoundError
+
+    class InputEvent(object):
+        BUTTON1_MASK = "left"
+        BUTTON3_MASK = "right"
+else:
+    from sikuli.Sikuli import getImagePath, capture
+    from org.sikuli.basics import ImageLocator
+    from org.sikuli.script import Pattern, FindFailed, Env
+    from java.io import FileNotFoundException
+    from java.awt.event import InputEvent
 
 class Entity(object):
     """
@@ -178,14 +215,14 @@ class Entity(object):
 
         
         # Support searching
-        if isinstance(key, str) or isinstance(key, unicode):                        
+        if isinstance(key, text_type):
             searcher = self.searcherStrategy()
             searcher.add(self)
             searchResult = searcher.search(key)            
             key = searchResult.getEntity() 
               
             # Expecting key = [<keyname>, <class>, <args>]
-        if isinstance(key[0], str) or isinstance(key[0], unicode): # If the key name is a string, it is usually a sub-entity
+        if isinstance(key[0], text_type): # If the key name is a string, it is usually a sub-entity
             keyName = key[0]
             keyType = KEY_TYPE_GENERIC_CLASS
             keyClass = key[1] # If the name is specified as a string, it is expected the second item in the array is the class
@@ -296,8 +333,6 @@ class Entity(object):
         trace = ""
         if showStackTrace:
             for frame in calframes:
-                print frame
-               
                 try:
                     match = re.search(r"[ =]([A-Z]\w+?)\(", frame[4][0]) # try and capture only new objects 
                     if match and match.group():                                        
@@ -328,11 +363,18 @@ class Entity(object):
     def move(self, region):
         
         self.validate()        
-        
-        self.region.mouseMove(self.region)
-        self.region.mouseDown(InputEvent.BUTTON1_MASK)
-        self.region.mouseMove(region)
-        self.region.mouseUp(InputEvent.BUTTON1_MASK)
+
+        if self.config.backend == BACKEND_SIKULIGO:
+            self.config.getScreen().drag_to(
+                self.region.getClickLocation(),
+                region,
+                button=InputEvent.BUTTON1_MASK,
+            )
+        else:
+            self.region.mouseMove(self.region)
+            self.region.mouseDown(InputEvent.BUTTON1_MASK)
+            self.region.mouseMove(region)
+            self.region.mouseUp(InputEvent.BUTTON1_MASK)
         
         self.invalidate()
         
@@ -371,7 +413,7 @@ class Entity(object):
                 self.logger.debug('identified at %%s', self.logger.getFormatter()(self.region).showBaseline())                
                 
                 self.status = self.STATUS_VALID
-            except ImageSearchExhausted, e:   
+            except ImageSearchExhausted:
                 raise UpdateFailureException("-- cannot find window")
             
         return self
@@ -384,7 +426,7 @@ class Entity(object):
         # Set args for proxy objects
         try:
             self.result.setResultArgs(resultArgs)
-        except AttributeError, e:
+        except AttributeError:
             pass
         finally:
             pass        
@@ -439,7 +481,10 @@ class Entity(object):
     
     def focus(self):        
         self.validate()
-        self.config.getScreen().mouseMove(self.region) 
+        if self.config.backend == BACKEND_SIKULIGO:
+            self.config.getScreen().move_to(self.region.getClickLocation())
+        else:
+            self.config.getScreen().mouseMove(self.region)
         return self
     
     def assertThat(self, text):        
@@ -454,13 +499,15 @@ class Entity(object):
             ImageLocator().locate( baselinePath )            
             result = self.region.find(baseline)                    
             self.logger.info('%%s matched %%s', self.logger.getFormatter()(result), self.logger.getFormatter()(baseline))
-        except FindFailed, e:            
+        except FindFailed:
             self.logger.error('%%s does not match %%s', self.logger.getFormatter()(self.region), self.logger.getFormatter()(baseline))
             raise Exception("Assertion failure")        
-        except FileNotFoundException, e: 
+        except FileNotFoundException:
             # Baseline doesn't exist, save a copy
-            shutil.copy(capture(self.region), baselinePath)        
-            self.logger.error("Baseline not provided, please verify the baseline %s manually" % (baselinePath))    
+            if self.config.backend == BACKEND_SIKULIGO:
+                raise Exception("Baseline not provided: %s" % baselinePath)
+            shutil.copy(capture(self.region), baselinePath)
+            self.logger.error("Baseline not provided, please verify the baseline %s manually" % (baselinePath))
                 
     def findEntityByName(self, query):
         """
@@ -499,7 +546,7 @@ class Entity(object):
                 self.validate()
                 self.invalidate()
                 
-        except FindExhaustedException, e:
+        except FindExhaustedException:
             self.logger.info("vanished %%s", self.logger.getFormatter()(self.config.getScreen()))
             
         
@@ -538,6 +585,9 @@ class Entity(object):
         """
         
         self.validate()
-        self.region.mouseMove(self.region)
+        if self.config.backend == BACKEND_SIKULIGO:
+            self.config.getScreen().move_to(self.region.getClickLocation())
+        else:
+            self.region.mouseMove(self.region)
         
         

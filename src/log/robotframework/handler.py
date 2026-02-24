@@ -35,4 +35,4 @@ class Handler(logging.Handler):
         logging.Handler.__init__(self)
 
     def emit(self, record):
-        print self.format(record)
+        print(self.format(record))

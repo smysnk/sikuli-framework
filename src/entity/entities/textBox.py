@@ -29,14 +29,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 from entity.entity import Entity
-from org.sikuli.script import KeyModifier, Key
 import re
-from java.awt.event import InputEvent
-from sikuli.Sikuli import sleep
-from wrapper import Env
-from sikuli.Region import Region
+from config import BACKEND_SIKULIGO, Config
 import string
-from org.sikuli.basics import OS
+import time
+
+if Config.backend == BACKEND_SIKULIGO:
+    from adapters.sikuligo_backend import Location
+
+    class KeyModifier(object):
+        CMD = "cmd"
+        CTRL = "ctrl"
+
+    class Key(object):
+        BACKSPACE = "backspace"
+
+    class InputEvent(object):
+        BUTTON1_MASK = "left"
+
+    class OS(object):
+        MAC = "mac"
+
+    class _Env(object):
+        @staticmethod
+        def getOS():
+            return "unknown"
+
+        @staticmethod
+        def getClipboard():
+            return ""
+
+    Env = _Env()
+
+    def sleep(seconds):
+        time.sleep(seconds)
+else:
+    from org.sikuli.script import KeyModifier, Key
+    from java.awt.event import InputEvent
+    from sikuli.Sikuli import sleep
+    from wrapper import Env
+    from sikuli.Region import Region
+    from org.sikuli.basics import OS
 
 class TextBox(Entity):
     """ Textbox Entity """
@@ -47,6 +80,10 @@ class TextBox(Entity):
         super(TextBox, self).__init__(parent, *args, **kargs)
         
     def assertEquals(self, expectedText):
+        if self.config.backend == BACKEND_SIKULIGO:
+            raise NotImplementedError(
+                "TextBox.assertEquals clipboard verification is not yet implemented for sikuligo backend"
+            )
         
         # If we're on MAC, use CMD instead of CTRL
         if Env.getOS() == OS.MAC:
@@ -73,6 +110,15 @@ class TextBox(Entity):
          
         # Ensure valid
         self.validate()
+
+        if self.config.backend == BACKEND_SIKULIGO:
+            click = self.region.getClickLocation()
+            self.config.getScreen().click_point(click.getX(), click.getY(), button=InputEvent.BUTTON1_MASK)
+            self.config.getScreen().type_text(str(text))
+            if verify:
+                self.logger.warn("Text verification through clipboard is not available on sikuligo backend")
+            self.logger.info('typed ["%s"], on %%s' % (text), self.logger.getFormatter()(self.parent))
+            return self.parent
 
         # Sometimes click isn't registered, implement our own version of click
         self.config.screen.mouseMove(self.region.getClickLocation())
@@ -131,4 +177,3 @@ class TextBox(Entity):
         self.logger.info('typed ["%s"], on %%s' % (text), self.logger.getFormatter()(self.parent))
         
         return self.parent
-

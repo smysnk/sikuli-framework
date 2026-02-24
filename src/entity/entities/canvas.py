@@ -29,21 +29,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 
-from entity import Entity
-from org.sikuli.basics import OS
-from org.sikuli.script import KeyModifier, Key, Location
+from entity.entity import Entity
 import re
-from java.awt.event import InputEvent
 from region.exception import FindExhaustedException
 from entity.exception import StateFailedException
-from sikuli.Sikuli import sleep
-from wrapper import Env
-from sikuli.Region import Region
 import time
 import math
 import string
 import os
-from entity.entities import ScrollBar, Button
+from entity.entities.scrollBar import ScrollBar
+from entity.entities.button import Button
+from config import BACKEND_SIKULIGO, Config
+
+if Config.backend == BACKEND_SIKULIGO:
+    from adapters.sikuligo_backend import Location, Region
+
+    class InputEvent(object):
+        BUTTON1_MASK = "left"
+else:
+    from org.sikuli.basics import OS
+    from org.sikuli.script import KeyModifier, Key, Location
+    from java.awt.event import InputEvent
+    from sikuli.Sikuli import sleep
+    from wrapper import Env
+    from sikuli.Region import Region
 
 class Canvas(Entity):
     
@@ -104,11 +113,17 @@ class Canvas(Entity):
     
     def startDrawing(self):
         #self.logger.trace("Starting to draw..")
-        self.region.mouseDown(InputEvent.BUTTON1_MASK)
+        if self.config.backend == BACKEND_SIKULIGO:
+            self.config.getScreen().mouseDown(InputEvent.BUTTON1_MASK)
+        else:
+            self.region.mouseDown(InputEvent.BUTTON1_MASK)
         
     def stopDrawing(self):
         #self.logger.trace("Stop drawing..")
-        self.region.mouseUp(InputEvent.BUTTON1_MASK)
+        if self.config.backend == BACKEND_SIKULIGO:
+            self.config.getScreen().mouseUp(InputEvent.BUTTON1_MASK)
+        else:
+            self.region.mouseUp(InputEvent.BUTTON1_MASK)
         
 
     

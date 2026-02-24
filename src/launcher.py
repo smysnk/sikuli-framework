@@ -70,7 +70,7 @@ class Launcher(object):
    
 
     @classmethod
-    def formatPrefix(cls, *args, **args):
+    def formatPrefix(cls, *args, **kwargs):
         return "[Launcher] "
     
     

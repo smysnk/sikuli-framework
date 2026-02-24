@@ -173,4 +173,4 @@ class RobotRemoteServer(SimpleXMLRPCServer):
     def _log(self, msg, level=None):
         if level:
             msg = '*%s* %s' % (level.upper(), msg)
-        print msg
+        print(msg)

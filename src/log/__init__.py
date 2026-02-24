@@ -30,6 +30,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 This logger 
 """
-from entityLoggerProxy import *
-from logger import *
-from level import *
+try:
+    from .entityLoggerProxy import *
+    from .logger import *
+    from .level import *
+except ImportError:  # pragma: no cover - legacy import path fallback
+    from entityLoggerProxy import *
+    from logger import *
+    from level import *

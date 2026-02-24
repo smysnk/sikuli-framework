@@ -55,7 +55,7 @@ import __main__
 try:
     # Set the baseline directory to be relative to the main script file
     Config.imageBaseline = "%s/baseline" % os.path.dirname(__main__.__file__)
-except AttributeError, e:
+except AttributeError:
     # We might be running from RobotFramework
     from robot.libraries.BuiltIn import BuiltIn
     Config.imageBaseline = "%s/baseline" % os.path.dirname(BuiltIn().replace_variables('${SUITE SOURCE}'))
@@ -63,7 +63,7 @@ except AttributeError, e:
 # Cleanup previous runs
 try:
     shutil.rmtree(Config.resultDir) # Delete results directory
-except OSError, e:
+except OSError:
     pass # Directory must have already been deleted
 
 # Create result directory structure
@@ -78,6 +78,7 @@ EntityLoggerProxy.setFormatter(Formatter)
 
 Config.setLogger(EntityLoggerProxy)
 Config.setScreenshotLoggingLevel(INFO)
+Config.initScreen()
 
 SikuliFrameworkException.setConfig(Config)
 SikuliFrameworkException.setLogger(EntityLoggerProxy)
@@ -90,7 +91,7 @@ Entity.setConfig(Config)
 
 ClickableEntity.setDefaultClickStrategy(StandardClick())
 ClickStrategy.setLogger(EntityLoggerProxy)
-ClickStrategy.setScreen(Config.screen)
+ClickStrategy.setScreen(Config.getScreen())
 
 Transform.setLogger(EntityLoggerProxy)
 RegionScreen.setConfig(Config)
@@ -114,7 +115,7 @@ Launcher.setLogger(EntityLoggerProxy)
 ## Boot
 
 logger = EntityLoggerProxy()
-logger.info("[SikuliFramework] Booting.. SikuliVersion=%s" % Env.getSikuliVersion())
+logger.info("[SikuliFramework] Booting.. backend=%s SikuliVersion=%s" % (Config.backend, Env.getSikuliVersion()))
 
 # Works on all platforms
 slash = "\\" if Env.getOS() == OS.WINDOWS else "/"
@@ -136,7 +137,7 @@ if Config.debugPlaybackMode:
     setShowActions(True)
 
 setAutoWaitTimeout(Config.waitTime)
-Config.screen.setAutoWaitTimeout(Config.waitTime)
+Config.getScreen().setAutoWaitTimeout(Config.waitTime)
 Region.timeout = Config.waitTime
 
 # Set the logging level

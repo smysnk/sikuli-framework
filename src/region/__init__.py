@@ -28,5 +28,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from transform import *
-from finder import *
+try:
+    from .transform import *
+    from .finder import *
+except ImportError:  # pragma: no cover - legacy import path fallback
+    from transform import *
+    from finder import *

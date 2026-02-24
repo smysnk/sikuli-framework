@@ -28,7 +28,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from md5 import md5
+from hashlib import md5
 import shutil
 
 
@@ -51,8 +51,10 @@ class Tool:
         Instead of saving two pictures, we just save one since they would have the same MD5.
         """
         
-        f = file(sourcePath,'rb')        
-        destFile = md5(f.read()).hexdigest() + sourcePath[-4:]        
+        with open(sourcePath, "rb") as f:
+            digest = md5(f.read()).hexdigest()
+
+        destFile = digest + sourcePath[-4:]
         shutil.copy(sourcePath, cls.destDir + destFile)
         
         return destFile

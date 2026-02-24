@@ -37,7 +37,7 @@ from entity.exception import StateFailedException
 from sikuli.Sikuli import sleep
 from sikuli.Region import Region
 import time
-from entity import Entity
+from entity.entity import Entity
 
 class ProgressBar(Entity):
     """ Button Entity """
@@ -70,7 +70,7 @@ class ProgressBar(Entity):
         ir = self.regionFinder(self, region=self.region, state=state) # image region of the button                
         try:
             region = ir.find()                                    
-        except FindExhaustedException, e:
+        except FindExhaustedException:
             raise StateFailedException("incorrect state [%s]" % state)
         else:
             self.logger.info("completed successfully!")

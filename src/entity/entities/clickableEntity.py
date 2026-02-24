@@ -28,11 +28,22 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from entity import Entity
-from java.awt.event import InputEvent
+from entity.entity import Entity
 from region.exception import FindExhaustedException
 from entity.exception import StateFailedException
-from sikuli.Sikuli import sleep
+from config import BACKEND_SIKULIGO, Config
+import time
+
+if Config.backend == BACKEND_SIKULIGO:
+    class InputEvent(object):
+        BUTTON1_MASK = "left"
+        BUTTON3_MASK = "right"
+
+    def sleep(seconds):
+        time.sleep(seconds)
+else:
+    from java.awt.event import InputEvent
+    from sikuli.Sikuli import sleep
 
 class ClickableEntity(Entity):
     
@@ -69,15 +80,22 @@ class ClickableEntity(Entity):
         
         # Ensure valid
         self.validate()
-                
-        # Move the mouse to this entity
-        self.config.screen.mouseMove(self.region)        
-        sleep(0.1) 
-        self.config.screen.mouseDown(InputEvent.BUTTON1_MASK)
-        sleep(0.4) 
-        self.config.screen.mouseMove(destination)
-        sleep(0.3)
-        self.config.screen.mouseUp(InputEvent.BUTTON1_MASK)
+
+        if self.config.backend == BACKEND_SIKULIGO:
+            self.config.getScreen().drag_to(
+                self.region.getClickLocation(),
+                destination,
+                button=self.LEFT_MOUSE,
+            )
+        else:
+            # Move the mouse to this entity
+            self.config.screen.mouseMove(self.region)
+            sleep(0.1)
+            self.config.screen.mouseDown(InputEvent.BUTTON1_MASK)
+            sleep(0.4)
+            self.config.screen.mouseMove(destination)
+            sleep(0.3)
+            self.config.screen.mouseUp(InputEvent.BUTTON1_MASK)
         
         # This entity is no longer valid since it's been dragged
         self.invalidate()
@@ -140,7 +158,7 @@ class ClickableEntity(Entity):
             try:
                 region = ir.find()                
                 
-            except FindExhaustedException, e:
+            except FindExhaustedException:
                 raise StateFailedException("incorrect state [%s]" % state)        
         
             self.logger.info('verified state state=%s %%s' % state, self.logger.getFormatter()(ir).showBaselines())

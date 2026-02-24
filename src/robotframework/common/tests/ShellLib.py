@@ -83,9 +83,9 @@ class Test(unittest.TestCase):
         
         command = Command()
         command.addParameter('msiexec.exe')
-        command.addParameter(unicode('/i "test.msi"'))
+        command.addParameter(str('/i "test.msi"'))
         
-        print str(command)
+        print(str(command))
 
 
 if __name__ == "__main__":

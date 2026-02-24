@@ -3,6 +3,12 @@ SikuliFramework - GUI Automation Framework for Sikuli
 
 SikuliFramework provides an object-oriented abstraction on top of [Sikuli](http://www.sikuli.org) to assist with interacting GUI elements, such as sets of buttons, checkboxes, radio buttons, windows and dialogue hierarchies for GUI automation and testing.  
 
+## Migration
+
+- Migration plan: `docs/migration-sikuligo-python-plan.md`
+- Feature parity tracker: `docs/migration-feature-matrix.md`
+- Migration tests: `pytest` (unit) and `SIKULIGO_INTEGRATION=1 pytest -m integration` (live backend)
+
 **What is Sikuli?**
 
 Sikuli is a visual technology to automate and test graphical user interfaces (GUI) using images (screenshots) of the software under test.

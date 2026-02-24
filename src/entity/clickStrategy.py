@@ -28,9 +28,22 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from sikuli.Sikuli import sleep
-from org.sikuli.script import Pattern
-from java.awt.event import InputEvent
+from config import BACKEND_SIKULIGO, Config
+import time
+
+if Config.backend == BACKEND_SIKULIGO:
+    from adapters.sikuligo_backend import Pattern
+
+    class InputEvent(object):
+        BUTTON1_MASK = "left"
+        BUTTON3_MASK = "right"
+
+    def sleep(seconds):
+        time.sleep(seconds)
+else:
+    from sikuli.Sikuli import sleep
+    from org.sikuli.script import Pattern
+    from java.awt.event import InputEvent
 
 class ClickStrategy(object):
     
@@ -48,7 +61,7 @@ class ClickStrategy(object):
     def __init__(self):
         pass
     
-    def click(self, *args, **args):        
+    def click(self, *args, **kwargs):
         raise Exception("Must be subclassed")
 
 class StandardClick(ClickStrategy):
@@ -58,9 +71,14 @@ class StandardClick(ClickStrategy):
 
     
     def click(self, entity, button=InputEvent.BUTTON1_MASK):
+        if Config.backend == BACKEND_SIKULIGO:
+            loc = entity.getRegion().getClickLocation()
+            self.screen.click_point(loc.getX(), loc.getY(), button=button)
+            return
+
         self.screen.mouseMove(entity.getRegion().getClickLocation())
-        sleep(0.1) 
-        self.screen.mouseDown(button)               
+        sleep(0.1)
+        self.screen.mouseDown(button)
         sleep(1)
         self.screen.mouseUp(button)
 
@@ -74,9 +92,14 @@ class QuickClick(ClickStrategy):
 
     
     def click(self, entity, button=InputEvent.BUTTON1_MASK):
+        if Config.backend == BACKEND_SIKULIGO:
+            loc = entity.getRegion().getClickLocation()
+            self.screen.click_point(loc.getX(), loc.getY(), button=button)
+            return
+
         self.screen.mouseMove(entity.getRegion().getClickLocation())
-        sleep(0.1) 
-        self.screen.mouseDown(button)               
+        sleep(0.1)
+        self.screen.mouseDown(button)
         self.screen.mouseUp(button)
         
 
@@ -90,8 +113,10 @@ class ClickAfterVisualChange(ClickStrategy):
         self.assertStateChanged = assertStateChanged
                     
     def click(self, entity, button=InputEvent.BUTTON1_MASK):
-
-        
+        if Config.backend == BACKEND_SIKULIGO:
+            loc = entity.getRegion().getClickLocation()
+            self.screen.click_point(loc.getX(), loc.getY(), button=button)
+            return
         # click
         self.screen.mouseMove(entity.getRegion().getClickLocation())
         sleep(0.5)        

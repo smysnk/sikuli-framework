@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import re
 import inspect
 from . import Entity, MultiResultProxy
+from compat import text_type
 
 class KeyNotFoundException(Exception):
     pass
@@ -131,7 +132,7 @@ class Searcher(object):
         client to be more specific if ambiguity arises.
         """
             
-        if isinstance(query, str) or isinstance(query, unicode):
+        if isinstance(query, text_type):
             return self.searchWithString(str(query))
         elif isinstance(query, tuple):
             # Member variable search 
@@ -215,7 +216,7 @@ class Searcher(object):
             raise KeyNotFoundException("Unable to find [%s] in:\n%s" % (query, "\n".join(poolItems)))
     
         # Return the match with the least number of words (it will be more specific)
-        for wordsMatchedIndex, matches in sorted(foundKeys.iteritems()):
+        for wordsMatchedIndex, matches in sorted(foundKeys.items()):
             
             if len(matches) > 1:          
                 raise AmbiguousKeySearchException("Target [%s] is ambiguous, matches=%s" % (query, matches))

@@ -34,6 +34,7 @@ from sikuli.Sikuli import sleep
 from entity import Entity
 from entity.entities import ClickableEntity
 from log import EntityLoggerProxy
+from compat import text_type
 
 
 class KeyNotInArgStorageException(Exception):
@@ -224,7 +225,7 @@ class SikuliFwRfAbstractLib(object):
         """ Retrieve an argument from storage using a key """
         
         # assert the key is a string
-        assert isinstance(key, str) or isinstance(key, unicode)
+        assert isinstance(key, text_type)
         
         try:
             self.logger.info("Resolved Entity=%%s", self.logger.getFormatter()(self.argStore[key]))
@@ -281,7 +282,7 @@ class SikuliFwRfAbstractLib(object):
         fixedArgs = []
         
         for arg in args:
-            arg = str(arg) if isinstance(arg, unicode) else arg
+            arg = str(arg) if isinstance(arg, text_type) else arg
             fixedArgs.append(arg)
         
         return fixedArgs

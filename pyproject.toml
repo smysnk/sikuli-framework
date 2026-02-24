@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sikuli-framework"
+version = "0.0.0"
+description = "SikuliFramework migration workspace (CPython3 + sikuligo backend)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "BSD-3-Clause" }
+authors = [{ name = "SikuliFramework Maintainers" }]
+dependencies = [
+  "sikuligo>=0.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+py-modules = []
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-q"
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+  "integration: live tests that require a running sikuligo binary/runtime",
+]

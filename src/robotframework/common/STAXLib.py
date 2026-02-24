@@ -34,6 +34,7 @@ import sys
 import java
 import string
 import logging
+from compat import text_type
 
 class STAXLib:
         
@@ -134,7 +135,7 @@ class STAXLib:
     def logResultData(self, map, key=None):
         """ Used for displaying the result of running a STAF/STAX command """
 
-        if isinstance(map, unicode):
+        if isinstance(map, text_type):
             
             self.log.info("%s=%s" % (key, map))
             return
@@ -156,7 +157,7 @@ class STAXLib:
                 #print type(map)
                 value = map.get(key)
             
-            if isinstance(map.get(key), unicode):
+            if isinstance(map.get(key), text_type):
                 self.log.info("%s=%s", key, value)
             elif isinstance(map.get(key), java.util.HashMap):
                 self.logResultData(value)

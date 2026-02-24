@@ -28,8 +28,13 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from org.sikuli.script import Location
-from sikuli.Region import Region
+from config import BACKEND_SIKULIGO, Config
+
+if Config.backend == BACKEND_SIKULIGO:
+    from adapters.sikuligo_backend import Location, Region
+else:
+    from org.sikuli.script import Location
+    from sikuli.Region import Region
 
 class DrawingStrategy(object):
     

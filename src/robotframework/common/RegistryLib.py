@@ -47,7 +47,7 @@ class RegistryLib(object):
             keyRes = _winreg.CreateKey(getattr(_winreg, match.group("namespace")), match.group("key"))
             _winreg.SetValueEx(keyRes, valueName, None, getattr(_winreg,type), value)
             _winreg.CloseKey(keyRes)
-            print "Key [%s\\%s], setting type [%s] value [%s=%s]" % (match.group("namespace"), match.group("key"), type, valueName, value)
+            print("Key [%s\\%s], setting type [%s] value [%s=%s]" % (match.group("namespace"), match.group("key"), type, valueName, value))
         finally:
             pass
 
@@ -83,7 +83,7 @@ class RegistryLib(object):
         try:
             keyRes = _winreg.CreateKey(getattr(_winreg, match.group("namespace")), key)
             _winreg.CloseKey(keyRes)
-            print "[%s] created." % (key)         
+            print("[%s] created." % (key))
         finally:
             pass
 

@@ -29,12 +29,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import pickle
-from org.sikuli.script import Location, Pattern
-from sikuli import Screen, Region
-from java.awt.event import InputEvent
-from sikuli.Sikuli import sleep
 import re
 import os
+from compat import execfile_compat, text_type
+from config import BACKEND_SIKULIGO, Config
+import time
+
+if Config.backend == BACKEND_SIKULIGO:
+    from adapters.sikuligo_backend import Location, Pattern, Region, Screen
+
+    class InputEvent(object):
+        BUTTON1_MASK = "left"
+
+    def sleep(seconds):
+        time.sleep(seconds)
+else:
+    from org.sikuli.script import Location, Pattern
+    from sikuli import Screen, Region
+    from java.awt.event import InputEvent
+    from sikuli.Sikuli import sleep
 
 class Transform(object):
     """ 
@@ -84,23 +97,23 @@ class Transform(object):
         
 
         # If we have a string, a path is supplied to png
-        if isinstance(source, unicode) or isinstance(source, str): 
+        if isinstance(source, text_type):
             
             transforms = defaultTransforms
             
             # Try and get extra attributes
             try:            
                 tempDict = {}
-                execfile(source[:-3] + "py", tempDict)
+                execfile_compat(source[:-3] + "py", tempDict)
                 transforms = tempDict['transforms']                
                 assert isinstance(transforms, dict)
                 
-            except TypeError, e: # If doesn't contain a tEXt section
+            except TypeError: # If doesn't contain a tEXt section
                 pass   
-            except AssertionError, e:         
+            except AssertionError:
                 pass # assertion raised- invalid format?                
                 self.logger.warn("Expecting dictionary got [%s] instead, possibly corrupted PNG attributes section in file [%s], using defaults" % (type(transforms), source))
-            except IOError, e:
+            except IOError:
                 pass # File doesn't exist
                                         
         # Otherwise a dictionary should be supplied

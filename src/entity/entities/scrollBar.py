@@ -28,8 +28,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from entity.entities import Button, Window
-from entity import Entity
+from entity.entities.button import Button
+from entity.entities.window import Window
+from entity.entity import Entity
 
 def invalidateDragBar(self, context):
     context[context.DRAG_BAR].invalidate()

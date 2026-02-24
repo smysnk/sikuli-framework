@@ -124,7 +124,7 @@ class EntityTests(unittest.TestCase):
             SPECKLE = ['speckle', Button]
             SPECK = ['speck', Button]
         
-        print type(Marble(None))
+        print(type(Marble(None)))
         
         entity = Marble(None)
         
