@@ -13,7 +13,7 @@ from adapters.sikuligo_backend import Screen
 
 
 def _integration_enabled() -> bool:
-    return os.getenv("SIKULIGO_INTEGRATION", "").strip() == "1"
+    return os.getenv("SIKULIGO_INTEGRATION", "1").strip() != "0"
 
 
 def _runtime_available() -> bool:

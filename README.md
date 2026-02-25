@@ -4,24 +4,27 @@ SikuliFramework provides an object-oriented abstraction on top of [Sikuli](http:
 
 ## Quickstart
 
-### 1) Prerequisites
-
-- Python `3.10+`
-
-### 2) Install framework + client deps
-
-From `sikuli-framework`:
-
 ```bash
 python -m pip install --upgrade pip
-python -m pip install pytest
 python -m pip install sikuligo
+cd sikuli-framework
+python -m pytest -q tests/test_sample_map_integration.py -m integration
 ```
 
-**What is Sikuli?**
+### Calculator example script
 
-Sikuli is a visual technology to automate and test graphical user interfaces (GUI) using images (screenshots) of the software under test.
-- [Wikipedia](http://en.wikipedia.org/wiki/Sikuli)
+```bash
+cd sikuli-framework/examples/calculator
+python validate.py
+python add.py
+```
+
+### TextEdit example script
+
+```bash
+cd sikuli-framework/examples/textedit
+python resize.py
+```
 
 ## Code Examples
 
@@ -103,6 +106,11 @@ Most traditional "Sikuli scripts" are created by capturing baseline images aroun
  - Solves some of Sikuli's common downfalls (false-positives, context issues)
  - Greatly improved reports for debugging and general-purpose
  - Increases the robustness of test scripts (less dependant on speed of the machine, resolution, other problems)
+
+**What is Sikuli?**
+
+Sikuli is a visual technology to automate and test graphical user interfaces (GUI) using images (screenshots) of the software under test.
+- [Wikipedia](http://en.wikipedia.org/wiki/Sikuli)
 
 ## Build and test workflows
 

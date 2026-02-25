@@ -33,6 +33,13 @@ Launches Calculator app, adds 2 + 2, verifies the result.
 Result log can be found in the /results directory. 
 """
 
+import sys
+from pathlib import Path
+
+_SRC = Path(__file__).resolve().parents[2] / "src"
+if str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
+
 import bootstrap
 from config import Config
 from log import EntityLoggerProxy
@@ -54,5 +61,4 @@ calculator[Calculator.BUTTON_CLEAR].click() \
     [Calculator.BUTTON_EQUALS].click()
 
 calculator[Calculator.LCD_DISPLAY].assertEquals("4")
-
 

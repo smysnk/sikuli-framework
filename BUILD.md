@@ -45,7 +45,6 @@ go build -o ./sikuligo ./cmd/sikuligrpc
 From `sikuli-framework`:
 
 ```bash
-export SIKULI_FRAMEWORK_BACKEND=sikuligo
 python -m pytest -q -m "not integration"
 ```
 
@@ -54,9 +53,21 @@ python -m pytest -q -m "not integration"
 From `sikuli-framework`:
 
 ```bash
-SIKULIGO_INTEGRATION=1 \
-SIKULIGO_BINARY_PATH=../sikuligo \
 python -m pytest -q -m integration
+```
+
+Defaults:
+
+- Backend defaults to `sikuligo`.
+- Integration tests default to enabled.
+- Binary path defaults to `../sikuligo` (repository root binary).
+
+Optional overrides:
+
+```bash
+export SIKULI_FRAMEWORK_BACKEND=sikuligo
+export SIKULIGO_INTEGRATION=0
+export SIKULIGO_BINARY_PATH=/custom/path/to/sikuligo
 ```
 
 ## Optional: manual server mode
