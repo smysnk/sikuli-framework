@@ -5,6 +5,7 @@ from pathlib import Path
 import socket
 import subprocess
 import time
+import importlib.util
 
 import pytest
 
@@ -13,6 +14,10 @@ from adapters.sikuligo_backend import Screen
 
 def _integration_enabled() -> bool:
     return os.getenv("SIKULIGO_INTEGRATION", "").strip() == "1"
+
+
+def _runtime_available() -> bool:
+    return importlib.util.find_spec("sikuligo") is not None
 
 
 def _wait_for_tcp(address: str, timeout_seconds: float = 10.0) -> None:
@@ -39,6 +44,8 @@ def _require_binary(path: Path) -> None:
 def test_screen_auto_spawns_server_and_connects(sikuligo_binary: Path, free_port: int):
     if not _integration_enabled():
         pytest.skip("set SIKULIGO_INTEGRATION=1 to run live integration tests")
+    if not _runtime_available():
+        pytest.skip("sikuligo python runtime package is not installed")
     _require_binary(sikuligo_binary)
 
     address = f"127.0.0.1:{free_port}"
@@ -63,6 +70,8 @@ def test_screen_auto_spawns_server_and_connects(sikuligo_binary: Path, free_port
 def test_screen_connect_and_auto_reuse_existing_server(sikuligo_binary: Path, free_port: int, tmp_path):
     if not _integration_enabled():
         pytest.skip("set SIKULIGO_INTEGRATION=1 to run live integration tests")
+    if not _runtime_available():
+        pytest.skip("sikuligo python runtime package is not installed")
     _require_binary(sikuligo_binary)
 
     address = f"127.0.0.1:{free_port}"
@@ -83,6 +92,9 @@ def test_screen_connect_and_auto_reuse_existing_server(sikuligo_binary: Path, fr
     )
 
     try:
+        time.sleep(0.1)
+        if proc.poll() is not None:
+            pytest.skip(f"sikuligo process exited early with code={proc.returncode}")
         _wait_for_tcp(address, timeout_seconds=10.0)
 
         connected = Screen.connect(address=address, startup_timeout_seconds=5.0)

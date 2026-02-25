@@ -28,5 +28,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from formatter import *
-from handler import *
+try:
+    from .formatter import *
+    from .handler import *
+except ImportError:  # pragma: no cover - legacy import path fallback
+    from formatter import *
+    from handler import *

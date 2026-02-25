@@ -28,7 +28,10 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 import string
-from level import *
+try:
+    from .level import *
+except ImportError:  # pragma: no cover - legacy import path fallback
+    from level import *
 
 class EntityLoggerProxy(object):
     """

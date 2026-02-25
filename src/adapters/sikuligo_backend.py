@@ -8,6 +8,11 @@ framework migration (`Screen`, `Region`, `Pattern`, `Location`).
 from __future__ import annotations
 
 from dataclasses import dataclass
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
 from typing import Any, Iterable
 
 try:
@@ -95,6 +100,42 @@ def _normalize_key(value: Any) -> str:
     if len(text) == 1:
         return text.lower()
     return lowered
+
+
+def _capture_to_png(path: str, bounds: tuple[int, int, int, int] | None) -> None:
+    if sys.platform == "darwin":
+        cmd = ["screencapture", "-x"]
+        if bounds is not None:
+            x, y, w, h = bounds
+            if w > 0 and h > 0:
+                cmd.append(f"-R{x},{y},{w},{h}")
+        cmd.append(path)
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return
+
+    import_cmd = shutil.which("import")
+    if import_cmd:
+        cmd = [import_cmd, "-window", "root"]
+        if bounds is not None:
+            x, y, w, h = bounds
+            if w > 0 and h > 0:
+                cmd.extend(["-crop", f"{w}x{h}+{x}+{y}"])
+        cmd.append(path)
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return
+
+    scrot_cmd = shutil.which("scrot")
+    if scrot_cmd:
+        cmd = [scrot_cmd]
+        if bounds is not None:
+            x, y, w, h = bounds
+            if w > 0 and h > 0:
+                cmd.extend(["-a", f"{x},{y},{w},{h}"])
+        cmd.append(path)
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return
+
+    raise BackendError("screen capture backend unavailable for this runtime")
 
 
 def _coerce_point(value: Any) -> tuple[int, int]:
@@ -444,6 +485,29 @@ class Screen(Region):
             scoped = self._raw_screen.region(int(x), int(y), int(w), int(h))
             return Region(scoped, screen=self, bounds=(int(x), int(y), int(w), int(h)))
         except Exception as exc:  # pragma: no cover - backend proxy
+            raise _to_backend_error(exc) from exc
+
+    @staticmethod
+    def _bounds_from_region(region: Any | None) -> tuple[int, int, int, int] | None:
+        if region is None:
+            return None
+        try:
+            return Region._coerce_bounds(region)
+        except Exception:
+            return None
+
+    def capture_region(self, region: Any | None = None) -> str:
+        bounds = self._bounds_from_region(region)
+        fd, path = tempfile.mkstemp(prefix="sikuligo-capture-", suffix=".png")
+        os.close(fd)
+        try:
+            _capture_to_png(path, bounds)
+            return path
+        except Exception as exc:
+            try:
+                os.unlink(path)
+            except OSError:
+                pass
             raise _to_backend_error(exc) from exc
 
     def move_mouse(self, x: int, y: int, delay_millis: int | None = None) -> None:

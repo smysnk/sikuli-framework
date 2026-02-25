@@ -29,11 +29,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import os
-from org.sikuli.script import Region
-from sikuli.Sikuli import capture
 import re
-from org.sikuli.script import Location, Pattern, Match
-from sikuli.Screen import Screen
+from config import BACKEND_SIKULIGO, Config
+
+if Config.backend == BACKEND_SIKULIGO:
+    from adapters.sikuligo_backend import Pattern, Region, Screen
+
+    class Match(object):
+        pass
+
+    def _legacy_capture(_region):
+        raise RuntimeError("legacy capture is unavailable for sikuligo backend")
+else:
+    from org.sikuli.script import Region
+    from sikuli.Sikuli import capture
+    from org.sikuli.script import Location, Pattern, Match
+    from sikuli.Screen import Screen
+
+    def _legacy_capture(region):
+        return capture(region)
 import entity
 from region.finder import FinderAbstract
 
@@ -77,6 +91,37 @@ class Formatter(object):
         else:
             self.entity = entity
         
+    @staticmethod
+    def _regex_or_default(value, pattern, group_name):
+        match = re.search(pattern, str(value), re.IGNORECASE)
+        if match:
+            return '"%s"' % match.group(group_name)
+        return '"%s"' % str(value)
+
+    @staticmethod
+    def _extract_pattern_path(pattern):
+        if hasattr(pattern, "raw") and hasattr(pattern.raw, "image"):
+            return str(pattern.raw.image)
+        if hasattr(pattern, "image"):
+            return str(pattern.image)
+        match = re.search(r'P\((?P<path>.*?)\)', str(pattern), re.IGNORECASE)
+        if match:
+            return match.group("path")
+        return None
+
+    def _capture_region(self, region):
+        if Config.backend == BACKEND_SIKULIGO:
+            screen = None
+            if hasattr(self.config, "getScreen"):
+                screen = self.config.getScreen()
+            if screen is None:
+                return None
+            capture_fn = getattr(screen, "capture_region", None)
+            if not callable(capture_fn):
+                return None
+            return capture_fn(region)
+        return _legacy_capture(region)
+
 
     def __str__(self):
         
@@ -86,25 +131,13 @@ class Formatter(object):
             labelStr = '"%s"' % self.label
         
         elif isinstance(self.entity, Match):
-            match = re.search(r"(?P<match>M\[.*?\])", str(self.entity), re.IGNORECASE)
-            if match:
-                labelStr = '"%s"' % match.group("match")
-            else:
-                raise Exception("Unable to regex match on [%s]" % str(self.entity))            
+            labelStr = self._regex_or_default(self.entity, r"(?P<match>M\[.*?\])", "match")
         
         elif isinstance(self.entity, Screen):
-            match = re.search(r"(?P<screen>Screen.*?\])", str(self.entity), re.IGNORECASE)
-            if match:
-                labelStr = '"%s"' % match.group("screen")
-            else:
-                raise Exception("Unable to regex match on Screen")            
+            labelStr = self._regex_or_default(self.entity, r"(?P<screen>Screen.*?\])", "screen")
         
         elif isinstance(self.entity, Region):
-            match = re.search(r"(?P<region>R\[.*?)@(?P<screen>.*\])", str(self.entity), re.IGNORECASE)
-            if match:
-                labelStr = '"%s"' % match.group("region")
-            else:
-                raise Exception("Unable to regex match on [%s]" % str(self.entity))
+            labelStr = self._regex_or_default(self.entity, r"(?P<region>R\[.*?)@(?P<screen>.*\])", "region")
 
         elif isinstance(self.entity, Pattern):
             labelStr = '"%s"' % str(self.entity)                        
@@ -136,17 +169,20 @@ class Formatter(object):
             region = self.entity
             
         elif isinstance(self.entity, Pattern):
-            
-            match = re.search(r'P\((?P<path>.*?)\)', str(self.entity), re.IGNORECASE)
-            if match:
-                imagePath = match.group("path")
+            imagePath = self._extract_pattern_path(self.entity)
+            if imagePath:
                 images.append(self.tool.saveAsset(imagePath))
             else:
                 raise Exception("Unaable to match path: %s" % str(self.entity))
 
                 # Capture images
         if self.meetsLogThreshold() and region:
-            images.append(self.tool.saveAsset((capture(region))) + ':Actual')
+            try:
+                captured = self._capture_region(region)
+            except Exception:
+                captured = None
+            if captured:
+                images.append(self.tool.saveAsset(captured) + ':Actual')
         
         if self.meetsLogThreshold() and regionFinder and self.doShowBaselines:
             seriesRange = []
@@ -170,8 +206,12 @@ class Formatter(object):
         return '[%s](%s)' % (labelStr, imageStr)
     
     def meetsLogThreshold(self):
-        
-        return self.level >= self.config.getScreenshotLoggingLevel()
+        if self.level is None or self.config is None:
+            return False
+        threshold = self.config.getScreenshotLoggingLevel()
+        if threshold is None:
+            return False
+        return self.level >= threshold
         
     
     def setLogLevel(self, level):        

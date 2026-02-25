@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from config import Config
 from log import Logger, DEBUG, INFO, TRACE
-from sikuli.Sikuli import sleep
+import time
 from entity import Entity
 from entity.entities import ClickableEntity
 from log import EntityLoggerProxy
@@ -211,7 +211,7 @@ class SikuliFwRfAbstractLib(object):
         
         level = str(level)
         
-        if str.lower(level) == 'INFO':
+        if str.lower(level) == 'info':
             Config.setScreenshotLoggingLevel(INFO)
         elif str.lower(level) == 'debug':
             Config.setScreenshotLoggingLevel(DEBUG)
@@ -249,7 +249,7 @@ class SikuliFwRfAbstractLib(object):
         Pauses the script for N seconds
         """
                 
-        sleep(int(duration))
+        time.sleep(float(duration))
     
     def captureScreen(self):
         self.logger.info("Screen=%%s", self.logger.getFormatter()(Config.screen))

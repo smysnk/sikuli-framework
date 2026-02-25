@@ -28,5 +28,15 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from robotRemoteServer import *
-from sikuliFwRfAbstractLib import *
+try:
+    from .sikuliFwRfAbstractLib import *
+except ImportError:  # pragma: no cover - legacy import path fallback
+    from sikuliFwRfAbstractLib import *
+
+try:  # pragma: no cover - optional legacy remote server helper
+    from .robotRemoteServer import *
+except Exception:
+    try:
+        from robotRemoteServer import *
+    except Exception:
+        pass
