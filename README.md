@@ -1,5 +1,4 @@
-SikuliFramework - GUI Automation Framework for Sikuli
-================
+# SikuliFramework - GUI Automation Framework for Sikuli [![SikuliFramework Tests](https://github.com/smysnk/SikuliGO/actions/workflows/go-test.yml/badge.svg?branch=master)](https://github.com/smysnk/SikuliGO/actions/workflows/go-test.yml) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://github.com/smysnk/SikuliGO/blob/master/sikuli-framework/pyproject.toml) [![Backend sikuligo](https://img.shields.io/badge/backend-sikuligo-0a7ea4)](https://github.com/smysnk/SikuliGO/blob/master/sikuli-framework/docs/migration-sikuligo-python-plan.md)
 
 SikuliFramework provides an object-oriented abstraction on top of [Sikuli](http://www.sikuli.org) to assist with interacting GUI elements, such as sets of buttons, checkboxes, radio buttons, windows and dialogue hierarchies for GUI automation and testing.  
 

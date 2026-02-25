@@ -3,6 +3,8 @@ from __future__ import annotations
 import os
 from pathlib import Path
 import re
+import sqlite3
+import time
 import zlib
 import importlib.util
 
@@ -79,6 +81,36 @@ def _write_gray_png(path: Path, rows: list[list[int]]) -> None:
     )
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(payload)
+
+
+def _session_snapshot(db_path: Path) -> tuple[int, int, int, list[str], list[str]]:
+    with sqlite3.connect(str(db_path)) as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT COUNT(*) FROM api_sessions")
+        api_count = int(cur.fetchone()[0])
+        cur.execute("SELECT COUNT(*) FROM client_sessions")
+        client_count = int(cur.fetchone()[0])
+        cur.execute("SELECT COUNT(*) FROM interactions")
+        interaction_count = int(cur.fetchone()[0])
+        cur.execute("SELECT method FROM interactions ORDER BY id ASC")
+        methods = [str(row[0]) for row in cur.fetchall()]
+        cur.execute("SELECT connection_id FROM client_sessions ORDER BY id ASC")
+        connection_ids = [str(row[0]) for row in cur.fetchall()]
+    return api_count, client_count, interaction_count, methods, connection_ids
+
+
+def _wait_for_interactions(db_path: Path, timeout_seconds: float = 3.0) -> tuple[int, int, int, list[str], list[str]]:
+    deadline = time.monotonic() + timeout_seconds
+    while time.monotonic() < deadline:
+        try:
+            snapshot = _session_snapshot(db_path)
+        except sqlite3.Error:
+            time.sleep(0.05)
+            continue
+        if snapshot[2] > 0:
+            return snapshot
+        time.sleep(0.05)
+    return _session_snapshot(db_path)
 
 
 class _Formatter:
@@ -219,11 +251,13 @@ def test_sample_map_validate_uses_live_grpc_find(sikuligo_binary: Path, free_por
 
     baseline_path = (tmp_path / "SampleMapEntity" / "SampleMapEntity.png").resolve()
     _write_gray_png(baseline_path, pattern_rows)
+    db_path = tmp_path / "sample-map-integration.db"
 
     address = f"127.0.0.1:{free_port}"
     screen = Screen.auto(
         address=address,
         binary_path=str(sikuligo_binary),
+        sqlite_path=str(db_path),
         admin_listen="",
         startup_timeout_seconds=10.0,
         stdio="ignore",
@@ -256,5 +290,16 @@ def test_sample_map_validate_uses_live_grpc_find(sikuligo_binary: Path, free_por
         assert mapped.region.getY() == 6
         assert mapped.region.getW() == 5
         assert mapped.region.getH() == 5
+
+        assert db_path.exists()
+        api_count, client_count, interaction_count, methods, connection_ids = _wait_for_interactions(db_path)
+        assert api_count >= 1
+        assert client_count >= 1
+        assert interaction_count >= 1
+        assert any(method.endswith("/Find") for method in methods)
+        uuid_re = re.compile(
+            r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        )
+        assert all(uuid_re.match(value) for value in connection_ids if value)
     finally:
         screen.close()
