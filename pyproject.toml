@@ -17,6 +17,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "pytest>=8.0.0",
+  "robotframework>=7.0.0",
 ]
 
 [tool.setuptools]
