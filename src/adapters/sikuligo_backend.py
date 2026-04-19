@@ -35,7 +35,7 @@ from .types import BackendError, BackendMatch
 def _require_runtime() -> None:
     if SikuligoPattern is None or SikuligoScreen is None:
         raise BackendError(
-            "Missing sikuligo runtime package. Install it first: pip install sikuligo"
+            "Missing sikuligo runtime package. Install it first: pip install sikuli-go"
         )
 
 

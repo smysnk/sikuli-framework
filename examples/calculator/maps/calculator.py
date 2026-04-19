@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 from entity import Window, Button, TextBox, DropDown, Application,\
-    CheckBox, Radio, ProgressBar
-from org.sikuli.basics import OS
+    CheckBox, Radio
+from wrapper import OS
 
         
 class Calculator(Application):

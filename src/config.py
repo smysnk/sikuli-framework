@@ -1,5 +1,5 @@
 """
-Copyright (c) 2013, SMART Technologies ULC 
+Copyright (c) 2013, SMART Technologies ULC
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,49 +28,41 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import os
+from adapters.sikuligo_backend import Screen
 
-BACKEND_LEGACY = "legacy"
 BACKEND_SIKULIGO = "sikuligo"
-_SELECTED_BACKEND = os.environ.get("SIKULI_FRAMEWORK_BACKEND", BACKEND_LEGACY).strip().lower()
 
 
 def _noop(*args, **kwargs):
     return None
 
 
-if _SELECTED_BACKEND == BACKEND_SIKULIGO:
-    from adapters.sikuligo_backend import Screen
+def getNumberScreens():
+    return 1
 
-    setShowActions = _noop
 
-    def getNumberScreens():
-        return 1
+class _Settings(object):
+    MoveMouseDelay = 0
+    SlowMotionDelay = 0
+    DelayAfterDrag = 0
+    DelayBeforeDrop = 0
+    MinSimilarity = 0.8
+    ObserveScanRate = 0.5
+    WaitScanRate = 1
 
-    class _Settings(object):
-        MoveMouseDelay = 0
-        SlowMotionDelay = 0
-        DelayAfterDrag = 0
-        DelayBeforeDrop = 0
-        MinSimilarity = 0.8
-        ObserveScanRate = 0.5
-        WaitScanRate = 1
 
-    Settings = _Settings
+Settings = _Settings
 
-    class _Thread(object):
-        @staticmethod
-        def currentThread():
-            return None
 
-    Thread = _Thread
-    JRegion = None
-else:
-    from sikuli.Sikuli import setShowActions, getNumberScreens
-    from org.sikuli.basics import Settings
-    from java.lang import Thread
-    from sikuli import Env, Screen
-    from org.sikuli.script import Region as JRegion
+class _Thread(object):
+    @staticmethod
+    def currentThread():
+        return None
+
+
+Thread = _Thread
+JRegion = None
+setShowActions = _noop
 
 # http://sikuli.org/docx/globals.html#Settings.MinSimilarity
 Settings.MoveMouseDelay = 0
@@ -82,7 +74,7 @@ Settings.ObserveScanRate = 0.5      # http://sikuli.org/docx/globals.html#Settin
 Settings.WaitScanRate = 1
 
 class Config():
-    backend = _SELECTED_BACKEND
+    backend = BACKEND_SIKULIGO
     
     highlightTime = 1  # When debugging is enabled.. highlight exists, wait, etc    
     waitTime = 0
@@ -115,10 +107,7 @@ class Config():
     def initScreen(cls):
         if cls.screen is not None:
             return cls.screen
-        if cls.backend == BACKEND_SIKULIGO:
-            cls.screen = Screen.auto()
-        else:
-            cls.screen = Screen(0)
+        cls.screen = Screen.auto()
         return cls.screen
 
     @classmethod

@@ -31,31 +31,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import time
 from region.exception import ImageMissingException,\
     ImageSearchExhausted, FindExhaustedException
-import sys
 import os
 import re
-from config import BACKEND_SIKULIGO
+from adapters.sikuligo_backend import Pattern, Region
+from adapters.types import BackendError
 
-_BACKEND = os.environ.get("SIKULI_FRAMEWORK_BACKEND", "legacy").strip().lower()
 
-if _BACKEND == BACKEND_SIKULIGO:
-    from adapters.sikuligo_backend import Pattern, Region
-    from adapters.types import BackendError
+class FindFailed(Exception):
+    pass
 
-    ImageLocator = None
 
-    class FindFailed(Exception):
-        pass
-
-    class FileNotFoundException(FileNotFoundError):
-        pass
-else:
-    from org.sikuli.script import FindFailed, Pattern
-    from org.sikuli.basics import ImageLocator
-    from java.io import FileNotFoundException
-    from sikuli.Region import Region
-
-    BackendError = RuntimeError
+class FileNotFoundException(FileNotFoundError):
+    pass
 
 class FinderAbstract(object):
     """
@@ -242,9 +229,6 @@ class Finder(FinderAbstract):
         raise ImageMissingException("cannot find image on disk [\"%s%s\"]" % (filename, self.state)) # if we don't have single image or sequence, file cannot be found
 
     def _locate_baseline(self, relative_image_path):
-        if _BACKEND != BACKEND_SIKULIGO:
-            return ImageLocator().locate(relative_image_path)[:-4] + ".png"
-
         roots = []
         if hasattr(self.config, "getImageSearchPaths"):
             roots.extend(self.config.getImageSearchPaths())
@@ -359,7 +343,7 @@ class Finder(FinderAbstract):
         for series in self.seriesRange:            
             regions = []
             lastRegion = self.region
-            nextRegion = self.region if _BACKEND == BACKEND_SIKULIGO else Region(self.region)
+            nextRegion = self.region
             
             # try to match all images in the sequence       
             try:                                
@@ -372,17 +356,14 @@ class Finder(FinderAbstract):
                     # Apply search attribs
 
                     pattern = transform.apply(
-                        Pattern.from_image(filename) if _BACKEND == BACKEND_SIKULIGO else Pattern(filename),
+                        Pattern.from_image(filename),
                         self.transform.CONTEXT_CURRENT,
                     )
                     self.logger.trace("Loading %%s", self.logger.getFormatter()(pattern))            
                     
                     # find the image on the screen
-                    if _BACKEND == BACKEND_SIKULIGO:
-                        timeout_millis = int(max(1, float(self.config.regionTimeout) * 1000))
-                        lastRegion = nextRegion.wait(pattern, timeout_millis=timeout_millis)
-                    else:
-                        lastRegion = nextRegion.wait(pattern) # If we don't set to zero wait time (dialog handler threads wait indefinitely)
+                    timeout_millis = int(max(1, float(self.config.regionTimeout) * 1000))
+                    lastRegion = nextRegion.wait(pattern, timeout_millis=timeout_millis)
                     lastRegion = transform.apply(lastRegion, self.transform.CONTEXT_MATCH)
                     
                     self.logger.trace("validated %%s %%s in region %%s nameType=%s colType=%s ser=%s seq=%s" % (self.nameType, self.collectionType, series, sequence), self.logger.getFormatter()(pattern), self.logger.getFormatter()(lastRegion), self.logger.getFormatter()(nextRegion))
@@ -390,10 +371,11 @@ class Finder(FinderAbstract):
 
                     # Transform next region with the spacial region
                     # spacialRegion is only used if there are spacial modifiers
-                    if _BACKEND == BACKEND_SIKULIGO:
-                        nextRegion = transform.apply(nextRegion, self.transform.CONTEXT_NEXT, override=lastRegion)
-                    else:
-                        nextRegion = transform.apply(Region(nextRegion), self.transform.CONTEXT_NEXT, override=lastRegion)
+                    nextRegion = transform.apply(
+                        nextRegion,
+                        self.transform.CONTEXT_NEXT,
+                        override=lastRegion,
+                    )
 
             except (FindFailed, BackendError):
                 self.logger.trace("failed to find on screen %%s in %%s nameType=%s colType=%s ser=%s seq=%s" % (self.nameType, self.collectionType, series, sequence),  self.logger.getFormatter()(self).setLabel("Images"), self.logger.getFormatter()(nextRegion))
@@ -402,7 +384,7 @@ class Finder(FinderAbstract):
                 region = None
                 for currentRegion in regions:
                     if not region:
-                        region = currentRegion if _BACKEND == BACKEND_SIKULIGO else Region(currentRegion)
+                        region = currentRegion
                     else:
                         merged = region.add(currentRegion)
                         if merged is not None:

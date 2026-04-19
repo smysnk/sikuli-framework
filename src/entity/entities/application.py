@@ -27,10 +27,10 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
-from entity.entity import Entity
-from wrapper import Env
 import re
-from org.sikuli.basics import OS
+
+from entity.entity import Entity
+from wrapper import OS
 
 class Application(Entity):
     """ Application Entitiy """
@@ -91,11 +91,13 @@ class Application(Entity):
             return None
 
     def parsePath(self, os, osVersion, arch, path):        
+        if not path:
+            return path
         if path[:1] == '/' or path[:3].lower() == 'c:\\':
             pass # absolute path        
-        elif os == OS.WINDOWS and (arch == 'x64' or osVersion == "XP"):
+        elif os == OS.WINDOWS and (arch in ("x64", "amd64", "arm64") or osVersion == "XP"):
             path = path.replace('<%Program Files%>', 'c:/Program Files')    
-        elif os == OS.WINDOWS and arch == 'x86':
+        elif os == OS.WINDOWS and arch in ("x86", "i386"):
             path = path.replace('<%Program Files%>', 'c:/Program Files (x86)')
         
         return path

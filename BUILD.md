@@ -21,7 +21,7 @@ Install from `sikuli-framework`:
 ```bash
 python -m pip install --upgrade pip
 python -m pip install pytest
-python -m pip install sikuligo
+python -m pip install sikuli-go
 python -m pip install "robotframework>=7.0.0"
 ```
 
@@ -58,14 +58,13 @@ python -m pytest -q -m integration
 
 Defaults:
 
-- Backend defaults to `sikuligo`.
+- SikuliGO is the only supported backend.
 - Integration tests default to enabled.
 - Binary path defaults to `../sikuligo` (repository root binary).
 
 Optional overrides:
 
 ```bash
-export SIKULI_FRAMEWORK_BACKEND=sikuligo
 export SIKULIGO_INTEGRATION=0
 export SIKULIGO_BINARY_PATH=/custom/path/to/sikuligo
 ```

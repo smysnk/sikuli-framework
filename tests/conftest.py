@@ -3,16 +3,27 @@ from __future__ import annotations
 import os
 from pathlib import Path
 import random
+import shutil
 
 import pytest
 
-
-# Run migration tests against the new backend path by default.
-os.environ.setdefault("SIKULI_FRAMEWORK_BACKEND", "sikuligo")
-
-
 def _workspace_root() -> Path:
     return Path(__file__).resolve().parents[2]
+
+
+def _binary_candidates() -> list[Path]:
+    path = Path(__file__).resolve()
+    candidates = []
+    for index in range(2, min(len(path.parents), 5)):
+        root = path.parents[index]
+        candidates.append(root / "sikuligo")
+        candidates.append(root / "sikuli-go")
+
+    for binary_name in ("sikuligo", "sikuli-go"):
+        resolved = shutil.which(binary_name)
+        if resolved:
+            candidates.append(Path(resolved).resolve())
+    return candidates
 
 
 @pytest.fixture(scope="session")
@@ -22,8 +33,10 @@ def sikuligo_binary() -> Path:
         candidate = Path(env).expanduser().resolve()
         if candidate.exists():
             return candidate
-    candidate = _workspace_root() / "sikuligo"
-    return candidate
+    for candidate in _binary_candidates():
+        if candidate.exists():
+            return candidate
+    return _workspace_root() / "sikuligo"
 
 
 @pytest.fixture()

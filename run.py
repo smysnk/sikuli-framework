@@ -149,9 +149,12 @@ class Target(object):
 		
 
 class RobotFramework(Target):
+
+	def getBinary(self):
+		return ['python']
 		
 	def getMainClass(self):		
-		return ["org.robotframework.RobotFramework"]
+		return []
 		
 	def getArgs(self):	
 		
@@ -159,6 +162,9 @@ class RobotFramework(Target):
 				'--outputdir=robotresults', \
 				'--loglevel=' + self.getLogLevel(), \
 				'--name', '"Product"'] + self.arguments + [ args.target ]
+
+	def getLaunchArgs(self):
+		return self.getBinary() + ['-m', 'robot'] + self.getArgs()
 	
 	def postProcessingTemplate(self):
 
@@ -293,4 +299,3 @@ except KeyboardInterrupt, e:
 	# Fixing terminal, for some reason terminal is messed up if you press ctrl-c
 	if os.name == 'posix':
 		subprocess.call('reset')		
-

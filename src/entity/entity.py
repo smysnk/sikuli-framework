@@ -42,12 +42,19 @@ from config import BACKEND_SIKULIGO, Config
 
 if Config.backend == BACKEND_SIKULIGO:
     from adapters.sikuligo_backend import Pattern
+    from wrapper import Env
 
     def getImagePath():
+        if hasattr(Config, "getImageSearchPaths"):
+            return Config.getImageSearchPaths()
         return []
 
     def capture(region):
-        raise NotImplementedError("capture is not implemented for sikuligo backend")
+        screen = Config.getScreen()
+        capture_fn = getattr(screen, "capture_region", None)
+        if not callable(capture_fn):
+            raise RuntimeError("capture_region is unavailable on the configured screen")
+        return capture_fn(region)
 
     class ImageLocator(object):
         def locate(self, relpath):
@@ -63,11 +70,6 @@ if Config.backend == BACKEND_SIKULIGO:
 
     class FindFailed(Exception):
         pass
-
-    class Env(object):
-        @staticmethod
-        def getOS():
-            return "unknown"
 
     FileNotFoundException = FileNotFoundError
 
@@ -504,8 +506,7 @@ class Entity(object):
             raise Exception("Assertion failure")        
         except FileNotFoundException:
             # Baseline doesn't exist, save a copy
-            if self.config.backend == BACKEND_SIKULIGO:
-                raise Exception("Baseline not provided: %s" % baselinePath)
+            os.makedirs(os.path.dirname(baselinePath), exist_ok=True)
             shutil.copy(capture(self.region), baselinePath)
             self.logger.error("Baseline not provided, please verify the baseline %s manually" % (baselinePath))
                 

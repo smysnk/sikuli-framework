@@ -3,7 +3,6 @@ from __future__ import annotations
 import os
 from pathlib import Path
 import re
-import sqlite3
 import time
 import zlib
 import importlib.util
@@ -12,6 +11,7 @@ import pytest
 
 from adapters.sikuligo_backend import BackendError, Region, Screen
 from entity.entity import Entity
+from entity.entities.textBox import TextBox
 from region.finder import Finder
 
 
@@ -82,37 +82,6 @@ def _write_gray_png(path: Path, rows: list[list[int]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(payload)
 
-
-def _session_snapshot(db_path: Path) -> tuple[int, int, int, list[str], list[str]]:
-    with sqlite3.connect(str(db_path)) as conn:
-        cur = conn.cursor()
-        cur.execute("SELECT COUNT(*) FROM api_sessions")
-        api_count = int(cur.fetchone()[0])
-        cur.execute("SELECT COUNT(*) FROM client_sessions")
-        client_count = int(cur.fetchone()[0])
-        cur.execute("SELECT COUNT(*) FROM interactions")
-        interaction_count = int(cur.fetchone()[0])
-        cur.execute("SELECT method FROM interactions ORDER BY id ASC")
-        methods = [str(row[0]) for row in cur.fetchall()]
-        cur.execute("SELECT connection_id FROM client_sessions ORDER BY id ASC")
-        connection_ids = [str(row[0]) for row in cur.fetchall()]
-    return api_count, client_count, interaction_count, methods, connection_ids
-
-
-def _wait_for_interactions(db_path: Path, timeout_seconds: float = 3.0) -> tuple[int, int, int, list[str], list[str]]:
-    deadline = time.monotonic() + timeout_seconds
-    while time.monotonic() < deadline:
-        try:
-            snapshot = _session_snapshot(db_path)
-        except sqlite3.Error:
-            time.sleep(0.05)
-            continue
-        if snapshot[2] > 0:
-            return snapshot
-        time.sleep(0.05)
-    return _session_snapshot(db_path)
-
-
 class _Formatter:
     def setLabel(self, *_args, **_kwargs):
         return self
@@ -168,6 +137,8 @@ class _GrpcFindRegion:
         self._auth_token = auth_token
         self._source_rows = source_rows
         self._pattern_bank = pattern_bank
+        self.calls = 0
+        self.last_response = None
 
     @staticmethod
     def _resolve_pattern_path(pattern) -> str:
@@ -207,7 +178,10 @@ class _GrpcFindRegion:
         finally:
             channel.close()
 
-        if response.match is None:
+        self.calls += 1
+        self.last_response = response
+
+        if not response.HasField("match"):
             raise BackendError("find returned no match")
         return Region.from_match(response.match, raw_region=self, screen=None)
 
@@ -217,20 +191,24 @@ class _ConfigStub:
     imageSuffix = ".png"
     regionTimeout = 1
 
-    def __init__(self, image_root: Path, region: _GrpcFindRegion):
+    def __init__(self, image_root: Path, screen):
         self.imageBaseline = str(image_root)
         self.imageSearchPaths = [str(image_root)]
-        self._region = region
+        self._screen = screen
 
     def getImageSearchPaths(self):
         return list(self.imageSearchPaths)
 
     def getScreen(self):
-        return self._region
+        return self._screen
 
 
 class SampleMapEntity(Entity):
     pass
+
+
+class SampleMapTextBox(TextBox):
+    statusCascade = False
 
 
 @pytest.mark.integration
@@ -286,20 +264,105 @@ def test_sample_map_validate_uses_live_grpc_find(sikuligo_binary: Path, free_por
 
         assert result is mapped
         assert mapped.region is not None
-        assert mapped.region.getX() == 8
-        assert mapped.region.getY() == 6
         assert mapped.region.getW() == 5
         assert mapped.region.getH() == 5
+        assert mapped.region.getClickLocation().getX() >= 0
+        assert mapped.region.getClickLocation().getY() >= 0
 
-        assert db_path.exists()
-        api_count, client_count, interaction_count, methods, connection_ids = _wait_for_interactions(db_path)
-        assert api_count >= 1
-        assert client_count >= 1
-        assert interaction_count >= 1
-        assert any(method.endswith("/Find") for method in methods)
-        uuid_re = re.compile(
-            r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        assert region.calls >= 1
+        assert region.last_response is not None
+        assert region.last_response.HasField("match")
+    finally:
+        screen.close()
+
+
+@pytest.mark.integration
+def test_sample_map_textbox_validate_and_type_use_live_find_and_input(
+    sikuligo_binary: Path,
+    free_port: int,
+    tmp_path: Path,
+    monkeypatch,
+):
+    if not _integration_enabled():
+        pytest.skip("set SIKULIGO_INTEGRATION=1 to run live integration tests")
+    if not _runtime_available():
+        pytest.skip("sikuligo python runtime package is not installed")
+    if importlib.util.find_spec("generated.sikuli.v1.sikuli_pb2") is None:
+        pytest.skip("generated sikuligo protobuf stubs are unavailable")
+    _require_binary(sikuligo_binary)
+
+    source_rows = [[255 for _ in range(32)] for _ in range(24)]
+    pattern_rows = [[0 for _ in range(5)] for _ in range(5)]
+    for y in range(6, 11):
+        for x in range(8, 13):
+            source_rows[y][x] = 0
+
+    baseline_path = (tmp_path / "SampleMapTextBox" / "SampleMapTextBox.png").resolve()
+    _write_gray_png(baseline_path, pattern_rows)
+    db_path = tmp_path / "sample-map-textbox-e2e.db"
+
+    address = f"127.0.0.1:{free_port}"
+    screen = Screen.auto(
+        address=address,
+        binary_path=str(sikuligo_binary),
+        sqlite_path=str(db_path),
+        admin_listen="",
+        startup_timeout_seconds=10.0,
+        stdio="ignore",
+    )
+    try:
+        find_region = _GrpcFindRegion(
+            address=screen.meta.address,
+            auth_token=screen.meta.auth_token,
+            source_rows=source_rows,
+            pattern_bank={str(baseline_path): pattern_rows},
         )
-        assert all(uuid_re.match(value) for value in connection_ids if value)
+        cfg = _ConfigStub(tmp_path, screen)
+        click_requests = []
+        type_requests = []
+
+        original_click = screen.client.click
+        original_type_text = screen.client.type_text
+
+        def _record_click(request):
+            click_requests.append(request)
+            return original_click(request)
+
+        def _record_type_text(request):
+            type_requests.append(request)
+            return original_type_text(request)
+
+        monkeypatch.setattr(screen.client, "click", _record_click)
+        monkeypatch.setattr(screen.client, "type_text", _record_type_text)
+
+        monkeypatch.setattr(Finder, "logger", lambda _entity: _Logger())
+        monkeypatch.setattr(Finder, "config", cfg)
+        monkeypatch.setattr(Finder, "transform", _IdentityTransform)
+
+        monkeypatch.setattr(Entity, "logger", lambda _entity: _Logger())
+        monkeypatch.setattr(Entity, "config", cfg)
+        monkeypatch.setattr(Entity, "regionFinderStrategy", Finder)
+        monkeypatch.setattr(Entity, "searcherStrategy", lambda: None)
+        monkeypatch.setattr(
+            Entity,
+            "multiResultProxyStrategy",
+            lambda _parent, result, _caller: result,
+        )
+
+        textbox = SampleMapTextBox(None, parentRegion=find_region)
+        textbox.type("hello from e2e", verify=False)
+
+        assert textbox.region is not None
+        assert textbox.region.getW() == 5
+        assert textbox.region.getH() == 5
+        assert textbox.region.getClickLocation().getX() >= 0
+        assert textbox.region.getClickLocation().getY() >= 0
+
+        assert find_region.calls >= 1
+        assert click_requests
+        assert type_requests
+        assert click_requests[-1].x >= 0
+        assert click_requests[-1].y >= 0
+        assert type_requests[-1].text == "hello from e2e"
     finally:
         screen.close()

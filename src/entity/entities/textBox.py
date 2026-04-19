@@ -36,6 +36,7 @@ import time
 
 if Config.backend == BACKEND_SIKULIGO:
     from adapters.sikuligo_backend import Location
+    from wrapper import Env, OS
 
     class KeyModifier(object):
         CMD = "cmd"
@@ -46,20 +47,6 @@ if Config.backend == BACKEND_SIKULIGO:
 
     class InputEvent(object):
         BUTTON1_MASK = "left"
-
-    class OS(object):
-        MAC = "mac"
-
-    class _Env(object):
-        @staticmethod
-        def getOS():
-            return "unknown"
-
-        @staticmethod
-        def getClipboard():
-            return ""
-
-    Env = _Env()
 
     def sleep(seconds):
         time.sleep(seconds)
@@ -81,9 +68,31 @@ class TextBox(Entity):
         
     def assertEquals(self, expectedText):
         if self.config.backend == BACKEND_SIKULIGO:
-            raise NotImplementedError(
-                "TextBox.assertEquals clipboard verification is not yet implemented for sikuligo backend"
-            )
+            self.validate()
+
+            if Env.getOS() == OS.MAC:
+                keyMod = KeyModifier.CMD
+            else:
+                keyMod = KeyModifier.CTRL
+
+            click = self.region.getClickLocation()
+            screen = self.config.getScreen()
+            screen.click_point(click.getX(), click.getY(), button=InputEvent.BUTTON1_MASK)
+            sleep(0.2)
+            screen.hotkey([keyMod, "a"])
+            sleep(0.2)
+            screen.hotkey([keyMod, "c"])
+            sleep(0.2)
+
+            clipboardContents = Env.getClipboard()
+            clipboardContents = clipboardContents.replace('\r', '')
+            clipboardContents = clipboardContents.replace('\n', '')
+            if clipboardContents != expectedText:
+                self.logger.error("Clipboard contents [%s] does not match expected value of [%s]" % (clipboardContents, expectedText))
+                raise Exception()
+            else:
+                self.logger.trace("Verified clipboard contents [%s] equals [%s]" % (clipboardContents, expectedText))
+            return
         
         # If we're on MAC, use CMD instead of CTRL
         if Env.getOS() == OS.MAC:

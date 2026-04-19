@@ -1,12 +1,20 @@
-# SikuliFramework - GUI Automation Framework for Sikuli [![Tests](https://img.shields.io/github/actions/workflow/status/smysnk/SikuliGO/go-test.yml?branch=master&label=tests)](https://github.com/smysnk/SikuliGO/actions/workflows/go-test.yml) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://github.com/smysnk/SikuliGO/blob/master/sikuli-framework/pyproject.toml) [![Backend sikuligo](https://img.shields.io/badge/backend-sikuligo-0a7ea4)](https://github.com/smysnk/SikuliGO/blob/master/sikuli-framework/docs/migration-sikuligo-python-plan.md)
+# SikuliFramework - GUI Automation Framework for Sikuli [![Tests](https://img.shields.io/github/actions/workflow/status/smysnk/SikuliGO/go-test.yml?branch=master&label=tests)](https://github.com/smysnk/SikuliGO/actions/workflows/go-test.yml) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://github.com/smysnk/SikuliGO/blob/master/sikuli-framework/pyproject.toml) [![Backend sikuligo](https://img.shields.io/badge/backend-sikuligo-0a7ea4)](https://github.com/smysnk/SikuliGO/blob/master/sikuli-framework/docs/sikuligo-cutover-implementation-plan.md)
 
-SikuliFramework provides an object-oriented abstraction on top of [Sikuli](http://www.sikuli.org) to assist with interacting GUI elements, such as sets of buttons, checkboxes, radio buttons, windows and dialogue hierarchies for GUI automation and testing.  
+SikuliFramework provides an object-oriented abstraction on top of [SikuliGO](https://smysnk.github.io/sikuli-go/) to assist with interacting GUI elements, such as sets of buttons, checkboxes, radio buttons, windows and dialogue hierarchies for GUI automation and testing.  
+
+> Note: SikuliFramework now uses [SikuliGO](https://github.com/smysnk/SikuliGO) as its implementation engine. The current cutover plan and verification notes live in [docs/sikuligo-cutover-implementation-plan.md](docs/sikuligo-cutover-implementation-plan.md).
+
+## What is SikuliGO?
+
+SikuliGO is the underlying automation API used by this framework. It provides image-based GUI automation capabilities over a local API process, while `sikuli-framework` provides higher-level page/object style abstractions, reusable entities, and Robot Framework-friendly keywords on top of it.
+
+SikuliGO is a Go port of core SikuliX automation concepts and workflows. In practice, this means you keep the familiar image-driven automation model from SikuliX while using a modern Go-based backend API and Python client integrations.
 
 ## Quickstart
 
 ```bash
 python -m pip install --upgrade pip
-python -m pip install sikuligo
+python -m pip install sikuli-go
 cd sikuli-framework
 python -m pytest -q tests/test_sample_map_integration.py -m integration
 ```
@@ -26,22 +34,17 @@ cd sikuli-framework/examples/textedit
 python resize.py
 ```
 
+### Robot Framework example run
+
+```bash
+cd sikuli-framework
+python -m pip install "robotframework>=7.0.0"
+./robot-runner.sh examples/robotframework/click.robot
+```
+
 ## Code Examples
 
-#### Work with applications in a more natural object-oriented way
-
-    calculator = Calculator()
-
-    # Chain together operations on the same window 
-    calculator[Calculator.BUTTON_2].click()
-        [Calculator.BUTTON_PLUS].click()
-        [Calculator.BUTTON_2].click() 
-        [Calculator.BUTTON_EQUALS].click()
-        
-    # Built-in assertions methods for testing purposes
-    calculator[Calculator.SCREEN].assertEquals("4")
-
-#### Integrates with RobotFramework to create extremely readable tests
+#### Robot Framework script + output
 
     *Setting*
     Library	keywords/CalculatorLib.py	WITH NAME	Calculator
@@ -58,15 +61,26 @@ python resize.py
 
 ![RobotFramework Results Log](https://github.com/smysnk/sikuli-framework/raw/master/docs/images/robo_example.png)
 
-#### Augments RobotFramework's log.html message statements, adding inline hyperlinking to captured images
-
 ![RobotFramework Results Log Hyperlinking](https://github.com/smysnk/sikuli-framework/raw/master/docs/images/robo_log_hyperlink.png)
 
-### Map out special GUI elements such as a TextBox, Radio, Checkbox + more and interact with them as such
+#### Python API examples
+
+    calculator = Calculator()
+
+    # Chain together operations on the same window 
+    calculator[Calculator.BUTTON_2].click()
+        [Calculator.BUTTON_PLUS].click()
+        [Calculator.BUTTON_2].click() 
+        [Calculator.BUTTON_EQUALS].click()
+        
+    # Built-in assertions methods for testing purposes
+    calculator[Calculator.SCREEN].assertEquals("4")
+
+#### Map out special GUI elements such as a TextBox, Radio, Checkbox + more and interact with them as such
 
     calculator[Calculator.SCREEN].type("25")
     
-### Map out the resulting actions of clicking a button
+#### Map out the resulting actions of clicking a button
     
     # Create initial application context
     textedit = TextEdit()
@@ -79,33 +93,29 @@ python resize.py
 
 ## Common problems with traditional "Sikuli scripts"
 
-Most traditional "Sikuli scripts" are created by capturing baseline images around a series of steps required to solve a particular problem.  This allows for the quick creation of a script to solve a problem.  There are however a few inherent problems with creating scripts in this method, these include:
+Traditional Sikuli scripts are often built by capturing screenshots for each step in a flow. This is fast to start, but it creates long-term maintenance and reliability issues.
 
-  - Maintainability issues
-     - Baseline images are usually very specific to a test and cannot be reused
-     - If the any of the baseline images change, multiple baseline images need be fixed for 1 change in the UI 
-     - No enforced naming convention for baseline pictures (Everyone has a different way of naming things)
-  - [Fragile tests](http://xunitpatterns.com/Fragile%20Test.html)
-     - "Sikuli script" often devolve into "hacky" code to get the job done, but it is hard to create truly maintainable tests
-        - Use of wait(seconds) function depends on computer being fairly fast or increased time is needed, lots of time is wasted waiting around, decreases the readability of tests if there are wait commands everywhere
-        - Operations are performed without validating whether the system is actually in sync
-            - Clicking a checkbox, is the checkbox actually selected after the operation?
-            - Entering text, is the text entered as you expect it?
-            - Did clicking a button actually perform the action you expected it to? A regular Sikuli script will only fail after it cannot find an image it is expecting to present on the screen
+- Hard to maintain:
+  - Screenshots are often specific to one test and hard to reuse.
+  - A small UI change can break multiple screenshots.
+  - Image naming is usually inconsistent across teams.
+- Fragile execution:
+  - Scripts often rely on fixed waits (`wait(seconds)`), which are sensitive to machine speed.
+  - Actions are executed without always validating application state first.
+  - Failures are often discovered late, only when a later image cannot be found.
+- Low signal diagnostics:
+  - Failures can be difficult to debug without structured context and richer logs.
 
-**SikuliFramework** was created to solve some of the complexities and also offers the following benefits:
+**SikuliFramework** addresses these issues and provides:
 
- - Cleaner, more readable code
- - Provides structure to the naming of baseline images
- - Dynamic resolution of image assets (Designate different images based on OS)
- - Encourages baseline reuse (Rather than capturing images to solve your immediate task, capture to solve all tasks)
- - Higher accuracy matching GUI components due to use of Regions
- - Tight integration with [RobotFramework](http://code.google.com/p/robotframework/) - Inspired by [Mike's cognition's Blog](http://blog.mykhailo.com/2011/02/how-to-sikuli-and-robot-framework.html) 
- - Encourages code reuse in RobotFramework test libraries
- - Streamlines baseline creation for assertions (baselines are created automatically during the initial run of the script)
- - Solves some of Sikuli's common downfalls (false-positives, context issues)
- - Greatly improved reports for debugging and general-purpose
- - Increases the robustness of test scripts (less dependant on speed of the machine, resolution, other problems)
+- Clearer, more maintainable automation code.
+- Structured conventions for baseline image naming and organization.
+- Reusable baseline assets across tests and workflows.
+- OS-aware image resolution for cross-platform execution.
+- Region-based interaction patterns to improve targeting accuracy.
+- Robot Framework-friendly libraries and reusable keyword patterns.
+- Better assertion and reporting workflows, including screenshot-based evidence.
+- More robust scripts that are less sensitive to timing and environment differences.
 
 **What is Sikuli?**
 

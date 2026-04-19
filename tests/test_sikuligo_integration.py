@@ -41,7 +41,11 @@ def _require_binary(path: Path) -> None:
 
 
 @pytest.mark.integration
-def test_screen_auto_spawns_server_and_connects(sikuligo_binary: Path, free_port: int):
+def test_screen_auto_spawns_server_and_connects(
+    sikuligo_binary: Path,
+    free_port: int,
+    tmp_path,
+):
     if not _integration_enabled():
         pytest.skip("set SIKULIGO_INTEGRATION=1 to run live integration tests")
     if not _runtime_available():
@@ -49,11 +53,13 @@ def test_screen_auto_spawns_server_and_connects(sikuligo_binary: Path, free_port
     _require_binary(sikuligo_binary)
 
     address = f"127.0.0.1:{free_port}"
+    db_path = tmp_path / "auto-spawn.db"
     os.environ["SIKULIGO_BINARY_PATH"] = str(sikuligo_binary)
 
     screen = Screen.auto(
         address=address,
         binary_path=str(sikuligo_binary),
+        sqlite_path=str(db_path),
         admin_listen="",
         startup_timeout_seconds=10.0,
         stdio="ignore",
