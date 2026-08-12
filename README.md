@@ -1,6 +1,6 @@
-# SikuliFramework - GUI Automation Framework for Sikuli [![Tests](https://img.shields.io/github/actions/workflow/status/smysnk/Sikuli-go/go-test.yml?branch=master&label=tests)](https://github.com/smysnk/sikuli-go/actions/workflows/go-test.yml) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://github.com/smysnk/sikuli-go/blob/master/sikuli-framework/pyproject.toml) [![Backend sikuligo](https://img.shields.io/badge/backend-sikuligo-0a7ea4)](https://github.com/smysnk/sikuli-go/blob/master/sikuli-framework/docs/sikuligo-cutover-implementation-plan.md)
+# SikuliFramework - GUI Automation Framework for Sikuli [![Tests](https://img.shields.io/github/actions/workflow/status/smysnk/Sikuli-go/go-test.yml?branch=master&label=tests)](https://github.com/smysnk/sikuli-go) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://github.com/smysnk/sikuli-go) [![Backend sikuligo](https://img.shields.io/badge/backend-sikuligo-0a7ea4)](https://github.com/smysnk/sikuli-go)
 
-SikuliFramework provides an object-oriented abstraction on top of [Sikuli-go](https://smysnk.github.io/sikuli-go/) to assist with interacting GUI elements, such as sets of buttons, checkboxes, radio buttons, windows and dialogue hierarchies for GUI automation and testing.  
+SikuliFramework provides an object-oriented abstraction on top of [Sikuli-go](https://github.com/smysnk/sikuli-go) to assist with interacting GUI elements, such as sets of buttons, checkboxes, radio buttons, windows and dialogue hierarchies for GUI automation and testing.
 
 > Note: SikuliFramework now uses [Sikuli-go](https://github.com/smysnk/sikuli-go) as its implementation engine.
 
